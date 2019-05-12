@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace HumanResources
+﻿namespace HumanResources
 {
     public interface IStaticResource
     {

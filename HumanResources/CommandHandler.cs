@@ -2,7 +2,6 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using HumanResources.AdminModule;
-using HumanResources.MarkModule;
 using HumanResources.Utilities;
 using System.Reflection;
 using System.Threading.Tasks;

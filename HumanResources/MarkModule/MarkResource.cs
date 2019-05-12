@@ -16,11 +16,10 @@ namespace HumanResources.MarkModule
         private const string Name = "marked.json";
         private Timer ValidateTimer;
         private readonly string Path = $"{Global.ResourceFolder}/{Name}";
+        private Dictionary<ulong, HashSet<ulong>> List { get; set; }
 
         public static MarkResource Instance { get { return lazy.Value; } }
-
-        public Dictionary<ulong, HashSet<ulong>> List { get; set; }
-
+        
         private MarkResource()
         {
             if (!Directory.Exists(Global.ResourceFolder))
@@ -28,10 +27,64 @@ namespace HumanResources.MarkModule
                 Directory.CreateDirectory(Global.ResourceFolder);
             }
             var temp = new Dictionary<ulong, HashSet<ulong>>();
-            if (File.Exists(Path) ? JsonUtil.TryRead(Path, out temp) : JsonUtil.TryWrite(Path, temp))
+            if (File.Exists(this.Path) ? JsonUtil.TryRead(this.Path, out temp) : JsonUtil.TryWrite(Path, temp))
             {
-                List = temp;
+                this.List = temp;
             }
+        }
+
+        public bool Save() => JsonUtil.TryWrite(this.Path, this.List);
+
+        public bool Close()
+        {
+            var toDelete = new List<ulong>();
+            foreach (var id in this.List.Keys)
+            {
+                if (!this.List[id].Any())
+                {
+                    toDelete.Add(id);
+                }
+            }
+            foreach (var id in toDelete)
+            {
+                this.List.Remove(id);
+            }
+
+            return this.Save();
+        }
+
+        public bool PushUser(ulong gid, ulong uid)
+        {
+            if (!this.List.ContainsKey(gid))
+            {
+                this.List.Add(gid, new HashSet<ulong>());
+            }
+            if (!this.List[gid].Contains(uid))
+            {
+                this.List[gid].Add(uid);
+                return true;
+            }
+            return false;
+        }
+
+        public bool PopUser(ulong gid, ulong uid)
+        {
+            if (Contains(gid, uid))
+            {
+                return this.List[gid].Remove(uid);
+            }
+            return false;
+        }
+
+        public bool Contains(ulong gid, ulong uid) => List.ContainsKey(gid) && List[gid].Contains(uid);
+
+        public bool PopGuild(ulong gid)
+        {
+            if (this.List.ContainsKey(gid))
+            {
+                return this.List.Remove(gid);
+            }
+            return false;
         }
 
         public async Task Start()
@@ -92,61 +145,6 @@ namespace HumanResources.MarkModule
                     _ = PopUser(user.GuildId, user.Id);
                 }
             }
-        }
-
-        public bool Save() => JsonUtil.TryWrite(Path, List);
-
-        public bool Close()
-        {
-            var toDelete = new HashSet<ulong>();
-            foreach (var id in List.Keys)
-            {
-                if (!List[id].Any())
-                {
-                    toDelete.Add(id);
-                }
-            }
-            foreach (var id in toDelete)
-            {
-                List.Remove(id);
-            }
-
-            return Save();
-        }
-
-        public bool PushUser(ulong gid, ulong uid)
-        {
-            if (!List.ContainsKey(gid))
-            {
-                List.Add(gid, new HashSet<ulong>());
-            }
-            if (!List[gid].Contains(uid))
-            {
-                List[gid].Add(uid);
-                return true;
-            }
-            return false;
-        }
-
-        public bool PopUser(ulong gid, ulong uid)
-        {
-            if (Contains(gid, uid))
-            {
-                return List[gid].Remove(uid);
-            }
-            return false;
-        }
-
-        public bool Contains(ulong gid, ulong uid) => List.ContainsKey(gid) && List[gid].Contains(uid);
-
-        public bool PopGuild(ulong gid)
-        {
-            if (List.ContainsKey(gid))
-            {
-                List.Remove(gid);
-                return true;
-            }
-            return false;
         }
     }
 }

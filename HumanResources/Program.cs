@@ -63,6 +63,7 @@ namespace HumanResources
             {
                 MarkResource.Instance,
                 BlacklistResource.Instance,
+                TimeoutResource.Instance,
             };
 
             this.Handler = new CommandHandler();
