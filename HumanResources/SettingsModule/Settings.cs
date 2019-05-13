@@ -41,7 +41,7 @@ namespace HumanResources.Settings
                 Mark = oldCfg.Mark,
                 Prefix = prefix,
             };
-            if (Config.UpdateGuild(Context.Guild.Id, newCfg))
+            if (Config.Update(Context.Guild.Id, newCfg))
             {
                 await ReplyAsync($":white_check_mark: Successfully set prefix to **{prefix}**");
             }
@@ -67,7 +67,7 @@ namespace HumanResources.Settings
                 Mark = mark,
                 Prefix = oldCfg.Prefix,
             };
-            if (Config.UpdateGuild(Context.Guild.Id, newCfg))
+            if (Config.Update(Context.Guild.Id, newCfg))
             {
                 MarkResource.Instance.MarkAll();
                 await ReplyAsync($":white_check_mark: Successfully set mark to **{mark}**");

@@ -22,41 +22,31 @@ namespace HumanResources.AdminModule
                 Directory.CreateDirectory(Global.ResourceFolder);
             }
             var temp = new Dictionary<ulong, HashSet<ulong>>();
-            if (File.Exists(Path) ? JsonUtil.TryRead(Path, out temp) : JsonUtil.TryWrite(Path, temp))
+            if (File.Exists(this.Path) ? JsonUtil.TryRead(this.Path, out temp) : JsonUtil.TryWrite(this.Path, temp))
             {
-                List = temp;
+                this.List = temp;
             }
         }
 
-        public bool Save() => JsonUtil.TryWrite(Path, List);
+        public bool Save() => JsonUtil.TryWrite(this.Path, this.List);
 
         public bool Close()
         {
-            var toDelete = new HashSet<ulong>();
-            foreach(var id in List.Keys)
-            {
-                if (!List[id].Any())
-                {
-                    toDelete.Add(id);
-                }
-            }
-            foreach(var id in toDelete)
-            {
-                List.Remove(id);
-            }
+            var toDelete = this.List.Keys.Where(x => !this.List[x].Any()).ToList();
+            toDelete.ForEach(x => this.List.Remove(x));
 
-            return Save();
+            return this.Save();
         }
 
         public bool Push(ulong gid, ulong uid)
         {
-            if (!List.ContainsKey(gid))
+            if (!this.List.ContainsKey(gid))
             {
-                List.Add(gid, new HashSet<ulong>());
+                this.List.Add(gid, new HashSet<ulong>());
             }
-            if (!List[gid].Contains(uid))
+            if (!this.List[gid].Contains(uid))
             {
-                List[gid].Add(uid);
+                this.List[gid].Add(uid);
                 return true;
             }
             return false;
@@ -64,22 +54,15 @@ namespace HumanResources.AdminModule
 
         public bool Pop(ulong gid, ulong uid)
         {
-            if (Contains(gid, uid))
+            if (this.Contains(gid, uid))
             {
-                return List[gid].Remove(uid);
+                return this.List[gid].Remove(uid);
             }
             return false;
         }
 
-        public bool Contains(ulong gid, ulong uid) => List.ContainsKey(gid) && List[gid].Contains(uid);
+        public bool Contains(ulong gid, ulong uid) => this.List.ContainsKey(gid) && this.List[gid].Contains(uid);
 
-        public bool RemoveGuild(ulong gid)
-        {
-            if (List.ContainsKey(gid))
-            {
-                return List.Remove(gid);
-            }
-            return false;
-        }
+        public bool RemoveGuild(ulong gid) => this.List.Remove(gid);
     }
 }

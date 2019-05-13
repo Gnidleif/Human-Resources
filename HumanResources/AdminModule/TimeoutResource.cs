@@ -22,7 +22,7 @@ namespace HumanResources.AdminModule
                 Directory.CreateDirectory(Global.ResourceFolder);
             }
             var temp = new Dictionary<ulong, Dictionary<ulong, ulong>>();
-            if (File.Exists(Path) ? JsonUtil.TryRead(this.Path, out temp) : JsonUtil.TryWrite(this.Path, temp))
+            if (File.Exists(this.Path) ? JsonUtil.TryRead(this.Path, out temp) : JsonUtil.TryWrite(this.Path, temp))
             {
                 this.List = temp;
             }
@@ -30,32 +30,15 @@ namespace HumanResources.AdminModule
 
         public bool Close()
         {
-            var toDelete = new List<ulong>();
-            foreach(var id in this.List.Keys)
-            {
-                if (!this.List[id].Any())
-                {
-                    toDelete.Add(id);
-                }
-            }
-            foreach(var id in toDelete)
-            {
-                this.List.Remove(id);
-            }
+            var toDelete = this.List.Keys.Where(x => !this.List[x].Any()).ToList();
+            toDelete.ForEach(x => this.List.Remove(x));
 
             return this.Save();
         }
 
         public bool Contains(ulong gid, ulong uid) => this.List.ContainsKey(gid) && this.List[gid].ContainsKey(uid);
 
-        public bool RemoveGuild(ulong gid)
-        {
-            if (this.List.ContainsKey(gid))
-            {
-                return this.List.Remove(gid);
-            }
-            return false;
-        }
+        public bool RemoveGuild(ulong gid) => this.List.Remove(gid);
 
         public bool Pop(ulong gid, ulong uid)
         {
@@ -66,10 +49,7 @@ namespace HumanResources.AdminModule
             return false;
         }
 
-        public bool Push(ulong gid, ulong uid)
-        {
-            return this.Push(gid, uid, LogUtil.UnixTime(DateTime.UtcNow.AddMinutes(10)));
-        }
+        public bool Push(ulong gid, ulong uid) => this.Push(gid, uid, LogUtil.UnixTime(DateTime.UtcNow.AddMinutes(10)));
 
         public bool Push(ulong gid, ulong uid, ulong time)
         {

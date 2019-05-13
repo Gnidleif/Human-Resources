@@ -8,20 +8,10 @@ namespace HumanResources
     {
         private const string Name = "config.json";
         private static readonly string Path = $"{Global.ResourceFolder}/{Name}";
-
-        public static GuildConfig DefaultGuildConfig
-        {
-            get
-            {
-                return new GuildConfig
-                {
-                    Prefix = '!',
-                    Mark = '⭐',
-                };
-            }
-        }
+        private static GuildConfig DefaultGuildConfig { get { return new GuildConfig { Prefix = '!', Mark = '⭐', }; } }
 
         public static BotConfig Bot { get; set; }
+
         static Config()
         {
             if (!Directory.Exists(Global.ResourceFolder))
@@ -49,7 +39,7 @@ namespace HumanResources
 
         public static bool Save() => JsonUtil.TryWrite(Path, Bot);
 
-        public static bool AddGuild(ulong id)
+        public static bool Push(ulong id)
         {
             if (!Bot.Guilds.ContainsKey(id))
             {
@@ -59,23 +49,13 @@ namespace HumanResources
             return false;
         }
 
-        public static bool DeleteGuild(ulong id) => Bot.Guilds.Remove(id);
+        public static bool Pop(ulong id) => Bot.Guilds.Remove(id);
 
-        public static bool UpdateGuild(ulong id, GuildConfig newCfg)
+        public static bool Update(ulong id, GuildConfig newCfg)
         {
             if (Bot.Guilds.ContainsKey(id))
             {
                 Bot.Guilds[id] = newCfg;
-                return true;
-            }
-            return false;
-        }
-
-        public static bool ResetGuild(ulong id)
-        {
-            if (Bot.Guilds.ContainsKey(id))
-            {
-                Bot.Guilds[id] = DefaultGuildConfig;
                 return true;
             }
             return false;

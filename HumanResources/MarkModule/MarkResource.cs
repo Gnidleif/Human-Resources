@@ -27,7 +27,7 @@ namespace HumanResources.MarkModule
                 Directory.CreateDirectory(Global.ResourceFolder);
             }
             var temp = new Dictionary<ulong, HashSet<ulong>>();
-            if (File.Exists(this.Path) ? JsonUtil.TryRead(this.Path, out temp) : JsonUtil.TryWrite(Path, temp))
+            if (File.Exists(this.Path) ? JsonUtil.TryRead(this.Path, out temp) : JsonUtil.TryWrite(this.Path, temp))
             {
                 this.List = temp;
             }
@@ -37,18 +37,8 @@ namespace HumanResources.MarkModule
 
         public bool Close()
         {
-            var toDelete = new List<ulong>();
-            foreach (var id in this.List.Keys)
-            {
-                if (!this.List[id].Any())
-                {
-                    toDelete.Add(id);
-                }
-            }
-            foreach (var id in toDelete)
-            {
-                this.List.Remove(id);
-            }
+            var toDelete = this.List.Keys.Where(x => !this.List[x].Any()).ToList();
+            toDelete.ForEach(x => this.List.Remove(x));
 
             return this.Save();
         }
@@ -69,23 +59,16 @@ namespace HumanResources.MarkModule
 
         public bool Pop(ulong gid, ulong uid)
         {
-            if (Contains(gid, uid))
+            if (this.Contains(gid, uid))
             {
                 return this.List[gid].Remove(uid);
             }
             return false;
         }
 
-        public bool Contains(ulong gid, ulong uid) => List.ContainsKey(gid) && List[gid].Contains(uid);
+        public bool Contains(ulong gid, ulong uid) => this.List.ContainsKey(gid) && this.List[gid].Contains(uid);
 
-        public bool RemoveGuild(ulong gid)
-        {
-            if (this.List.ContainsKey(gid))
-            {
-                return this.List.Remove(gid);
-            }
-            return false;
-        }
+        public bool RemoveGuild(ulong gid) => this.List.Remove(gid);
 
         public async Task Start()
         {
@@ -103,13 +86,13 @@ namespace HumanResources.MarkModule
 
         private void ValidateTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            MarkAll();
-            _ = Save();
+            this.MarkAll();
+            _ = this.Save();
         }
 
         public void MarkAll()
         {
-            foreach (var gid in List.Keys)
+            foreach (var gid in this.List.Keys)
             {
                 var mark = Config.Bot.Guilds[gid].Mark;
                 var guild = Global.Client.GetGuild(gid);
@@ -117,14 +100,14 @@ namespace HumanResources.MarkModule
                 {
                     continue;
                 }
-                foreach (var uid in List[gid])
+                foreach (var uid in this.List[gid])
                 {
                     var user = guild.GetUser(uid);
                     if (user == null)
                     {
                         continue;
                     }
-                    _ = CheckSet(user, mark);
+                    _ = this.CheckSet(user, mark);
                 }
             }
         }
@@ -142,7 +125,7 @@ namespace HumanResources.MarkModule
                 catch (Discord.Net.HttpException e)
                 {
                     LogUtil.Write("MarkHandler:CheckSet", e.Message);
-                    _ = Pop(user.GuildId, user.Id);
+                    _ = this.Pop(user.GuildId, user.Id);
                 }
             }
         }

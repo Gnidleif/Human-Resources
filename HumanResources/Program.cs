@@ -20,7 +20,7 @@ namespace HumanResources
         {
             if (string.IsNullOrEmpty(Config.Bot.Token))
             {
-                Console.WriteLine("No token detected, please provice a valid token: ");
+                Console.WriteLine("No token detected, please provide a valid token:");
                 var input = Console.ReadLine();
                 Config.Bot = new BotConfig
                 {
@@ -40,7 +40,6 @@ namespace HumanResources
             Global.Client.JoinedGuild += Client_JoinedGuild;
             Global.Client.Ready += Client_Ready;
             Global.Client.Disconnected += Client_Disconnected;
-            AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
 
             try
             {
@@ -65,6 +64,7 @@ namespace HumanResources
                 BlacklistResource.Instance,
                 TimeoutResource.Instance,
             };
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler(Exiting);
 
             this.Handler = new CommandHandler();
             await this.Handler.InitializeAsync();
@@ -80,7 +80,7 @@ namespace HumanResources
 
         private async Task Client_LeftGuild(SocketGuild arg)
         {
-            if (Config.DeleteGuild(arg.Id))
+            if (Config.Pop(arg.Id))
             {
                 LogUtil.Write("Client_LeftGuild", $"Successfully removed {arg.Id} from Config");
             }
@@ -95,7 +95,7 @@ namespace HumanResources
 
         private async Task Client_JoinedGuild(SocketGuild arg)
         {
-            if (Config.AddGuild(arg.Id))
+            if (Config.Push(arg.Id))
             {
                 LogUtil.Write("Client_JoinedGuild", $"Successfully joined {arg.Id}");
             }
@@ -107,14 +107,11 @@ namespace HumanResources
         {
             foreach(var id in Global.Client.Guilds.Select(x => x.Id))
             {
-                _ = Config.AddGuild(id);
+                _ = Config.Push(id);
             }
 
             _ = Config.Save();
-            foreach(var r in this.Resources)
-            {
-                _ = r.Save();
-            }
+            this.Resources.ForEach(x => x.Save());
 
             _ = MarkResource.Instance.Start();
             MarkResource.Instance.MarkAll();
@@ -125,21 +122,15 @@ namespace HumanResources
         private async Task Client_Disconnected(Exception arg)
         {
             _ = Config.Save();
-            foreach(var r in this.Resources)
-            {
-                _ = r.Save();
-            }
+            this.Resources.ForEach(x => x.Save());
 
             await Task.CompletedTask;
         }
 
-        private void CurrentDomain_ProcessExit(object sender, EventArgs e)
+        private void Exiting(object sender, EventArgs e)
         {
             _ = Config.Save();
-            foreach(var r in this.Resources)
-            {
-                _ = r.Close();
-            }
+            this.Resources.ForEach(x => x.Close());
         }
     }
 }

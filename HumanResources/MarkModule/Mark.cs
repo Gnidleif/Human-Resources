@@ -8,7 +8,7 @@ namespace HumanResources.MarkModule
     public class Mark : ModuleBase<SocketCommandContext>
     {
         [Command("mark"), Summary("Marks specified user")]
-        [RequireBotPermission(GuildPermission.ChangeNickname)]
+        [RequireBotPermission(GuildPermission.ManageNicknames)]
         [RequireUserPermission(GuildPermission.Administrator)]
         public async Task MarkUser(IGuildUser user)
         {
@@ -20,7 +20,7 @@ namespace HumanResources.MarkModule
         }
 
         [Command("unmark"), Summary("Unmark specified user")]
-        [RequireBotPermission(GuildPermission.ChangeNickname)]
+        [RequireBotPermission(GuildPermission.ManageNicknames)]
         [RequireUserPermission(GuildPermission.Administrator)]
         public async Task UnmarkUser(IGuildUser user)
         {
