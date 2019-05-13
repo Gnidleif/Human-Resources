@@ -35,6 +35,7 @@ namespace HumanResources
                 LogLevel = Discord.LogSeverity.Verbose,
             });
 
+            Global.Client.LatencyUpdated += Client_LatencyUpdated;
             Global.Client.Log += Client_Log;
             Global.Client.LeftGuild += Client_LeftGuild;
             Global.Client.JoinedGuild += Client_JoinedGuild;
@@ -64,12 +65,20 @@ namespace HumanResources
                 BlacklistResource.Instance,
                 TimeoutResource.Instance,
             };
-            AppDomain.CurrentDomain.ProcessExit += new EventHandler(Exiting);
-
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
+            
             this.Handler = new CommandHandler();
             await this.Handler.InitializeAsync();
 
             await Task.Delay(-1);
+        }
+
+        private async Task Client_LatencyUpdated(int arg1, int arg2)
+        {
+            _ = Config.Save();
+            this.Resources.ForEach(x => x.Close());
+
+            await Task.CompletedTask;
         }
 
         private async Task Client_Log(Discord.LogMessage arg)
@@ -122,12 +131,12 @@ namespace HumanResources
         private async Task Client_Disconnected(Exception arg)
         {
             _ = Config.Save();
-            this.Resources.ForEach(x => x.Save());
+            this.Resources.ForEach(x => x.Close());
 
             await Task.CompletedTask;
         }
 
-        private void Exiting(object sender, EventArgs e)
+        private void CurrentDomain_ProcessExit(object sender, EventArgs e)
         {
             _ = Config.Save();
             this.Resources.ForEach(x => x.Close());
