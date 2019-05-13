@@ -48,7 +48,7 @@ namespace HumanResources.AdminModule
             return Save();
         }
 
-        public bool PushUser(ulong gid, ulong uid)
+        public bool Push(ulong gid, ulong uid)
         {
             if (!List.ContainsKey(gid))
             {
@@ -62,7 +62,7 @@ namespace HumanResources.AdminModule
             return false;
         }
 
-        public bool PopUser(ulong gid, ulong uid)
+        public bool Pop(ulong gid, ulong uid)
         {
             if (Contains(gid, uid))
             {
@@ -73,7 +73,7 @@ namespace HumanResources.AdminModule
 
         public bool Contains(ulong gid, ulong uid) => List.ContainsKey(gid) && List[gid].Contains(uid);
 
-        public bool PopGuild(ulong gid)
+        public bool RemoveGuild(ulong gid)
         {
             if (List.ContainsKey(gid))
             {

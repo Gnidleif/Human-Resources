@@ -48,7 +48,7 @@ namespace HumanResources.AdminModule
 
         public bool Contains(ulong gid, ulong uid) => this.List.ContainsKey(gid) && this.List[gid].ContainsKey(uid);
 
-        public bool PopGuild(ulong gid)
+        public bool RemoveGuild(ulong gid)
         {
             if (this.List.ContainsKey(gid))
             {
@@ -57,7 +57,7 @@ namespace HumanResources.AdminModule
             return false;
         }
 
-        public bool PopUser(ulong gid, ulong uid)
+        public bool Pop(ulong gid, ulong uid)
         {
             if (this.Contains(gid, uid))
             {
@@ -66,12 +66,12 @@ namespace HumanResources.AdminModule
             return false;
         }
 
-        public bool PushUser(ulong gid, ulong uid)
+        public bool Push(ulong gid, ulong uid)
         {
-            return this.PushUser(gid, uid, LogUtil.UnixTime(DateTime.UtcNow.AddMinutes(10)));
+            return this.Push(gid, uid, LogUtil.UnixTime(DateTime.UtcNow.AddMinutes(10)));
         }
 
-        public bool PushUser(ulong gid, ulong uid, ulong time)
+        public bool Push(ulong gid, ulong uid, ulong time)
         {
             if (!this.List.ContainsKey(gid))
             {

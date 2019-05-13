@@ -88,7 +88,7 @@ namespace HumanResources.AdminModule
         [RequireUserPermission(GuildPermission.Administrator)]
         public async Task BlacklistUser(IGuildUser user, [Remainder] string reason = "None")
         {
-            if (BlacklistResource.Instance.PushUser(user.GuildId, user.Id))
+            if (BlacklistResource.Instance.Push(user.GuildId, user.Id))
             {
                 var embed = new EmbedBuilder();
                 embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
@@ -104,7 +104,7 @@ namespace HumanResources.AdminModule
         [RequireUserPermission(GuildPermission.Administrator)]
         public async Task WhitelistUser(IGuildUser user)
         {
-            if (BlacklistResource.Instance.PopUser(user.GuildId, user.Id))
+            if (BlacklistResource.Instance.Pop(user.GuildId, user.Id))
             {
                 await ReplyAsync($"{Context.User.Mention} restored bot access to {user.Mention}");
             }

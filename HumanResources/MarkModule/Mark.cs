@@ -12,7 +12,7 @@ namespace HumanResources.MarkModule
         [RequireUserPermission(GuildPermission.Administrator)]
         public async Task MarkUser(IGuildUser user)
         {
-            if (MarkResource.Instance.PushUser(user.GuildId, user.Id))
+            if (MarkResource.Instance.Push(user.GuildId, user.Id))
             {
                 var mark = Config.Bot.Guilds[user.GuildId].Mark;
                 await MarkResource.Instance.CheckSet(user, mark);
@@ -24,7 +24,7 @@ namespace HumanResources.MarkModule
         [RequireUserPermission(GuildPermission.Administrator)]
         public async Task UnmarkUser(IGuildUser user)
         {
-            if (MarkResource.Instance.PopUser(user.GuildId, user.Id))
+            if (MarkResource.Instance.Pop(user.GuildId, user.Id))
             {
                 try
                 {

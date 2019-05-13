@@ -53,7 +53,7 @@ namespace HumanResources.MarkModule
             return this.Save();
         }
 
-        public bool PushUser(ulong gid, ulong uid)
+        public bool Push(ulong gid, ulong uid)
         {
             if (!this.List.ContainsKey(gid))
             {
@@ -67,7 +67,7 @@ namespace HumanResources.MarkModule
             return false;
         }
 
-        public bool PopUser(ulong gid, ulong uid)
+        public bool Pop(ulong gid, ulong uid)
         {
             if (Contains(gid, uid))
             {
@@ -78,7 +78,7 @@ namespace HumanResources.MarkModule
 
         public bool Contains(ulong gid, ulong uid) => List.ContainsKey(gid) && List[gid].Contains(uid);
 
-        public bool PopGuild(ulong gid)
+        public bool RemoveGuild(ulong gid)
         {
             if (this.List.ContainsKey(gid))
             {
@@ -142,7 +142,7 @@ namespace HumanResources.MarkModule
                 catch (Discord.Net.HttpException e)
                 {
                     LogUtil.Write("MarkHandler:CheckSet", e.Message);
-                    _ = PopUser(user.GuildId, user.Id);
+                    _ = Pop(user.GuildId, user.Id);
                 }
             }
         }

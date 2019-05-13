@@ -85,7 +85,7 @@ namespace HumanResources
                 LogUtil.Write("Client_LeftGuild", $"Successfully removed {arg.Id} from Config");
             }
 
-            if (MarkResource.Instance.PopGuild(arg.Id))
+            if (MarkResource.Instance.RemoveGuild(arg.Id))
             {
                 LogUtil.Write("Client_LeftGuild", $"Successfully removed {arg.Id} from MarkHandler");
             }

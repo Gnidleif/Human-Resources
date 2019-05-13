@@ -4,9 +4,9 @@
     {
         bool Save();
         bool Close();
-        bool PushUser(ulong gid, ulong uid);
-        bool PopUser(ulong gid, ulong uid);
+        bool Push(ulong gid, ulong uid);
+        bool Pop(ulong gid, ulong uid);
         bool Contains(ulong gid, ulong uid);
-        bool PopGuild(ulong gid);
+        bool RemoveGuild(ulong gid);
     }
 }
