@@ -1,16 +1,17 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using HumanResources.MarkModule;
+using HumanResources.AdminModule;
 using HumanResources.Utilities;
 using System.Threading.Tasks;
 
 namespace HumanResources.Settings
 {
+  [Group("settings")]
   [Remarks("Most of these functions are only accessible by guild administrators")]
   public class Settings : ModuleBase<SocketCommandContext>
   {
-    [Command("getsettings"), Summary("Returns the bot settings for the guild")]
+    [Command, Summary("Returns the bot settings for the guild")]
     public async Task GetSettings()
     {
       var guildCfg = Config.Bot.Guilds[Context.Guild.Id];
@@ -25,7 +26,7 @@ namespace HumanResources.Settings
       await ReplyAsync("", false, embed.Build());
     }
 
-    [Command("setprefix"), Summary("Set command prefix for the guild")]
+    [Command("prefix"), Summary("Set command prefix for the guild")]
     [RequireUserPermission(GuildPermission.Administrator)]
     [RequireBotPermission(GuildPermission.Administrator)]
     public async Task SetPrefix(char prefix)
@@ -51,7 +52,7 @@ namespace HumanResources.Settings
       }
     }
 
-    [Command("setmark"), Summary("Set mark for the guild")]
+    [Command("mark"), Summary("Set mark for the guild")]
     [RequireUserPermission(GuildPermission.Administrator)]
     [RequireBotPermission(GuildPermission.Administrator)]
     public async Task SetMark(char mark)

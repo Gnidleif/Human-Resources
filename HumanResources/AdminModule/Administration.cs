@@ -8,6 +8,7 @@ namespace HumanResources.AdminModule
 {
   public class Administration : ModuleBase<SocketCommandContext>
   {
+    #region General
     [Command("kick"), Alias("k"), Summary("Kicks specified user")]
     [RequireBotPermission(GuildPermission.KickMembers)]
     [RequireUserPermission(GuildPermission.KickMembers)]
@@ -84,63 +85,109 @@ namespace HumanResources.AdminModule
 
       await ReplyAsync("", false, embed.Build());
     }
+    #endregion
 
-    [Command("blacklist"), Alias("bl"), Summary("Blacklists user from bot usage")]
+    #region Blacklist
+    [Group("blacklist")]
     [RequireUserPermission(GuildPermission.Administrator)]
-    public async Task BlacklistUser(IGuildUser user, [Remainder] string reason = "None")
+    public class Blacklist : ModuleBase<SocketCommandContext>
     {
-      if (BlacklistResource.Instance.Push(user.GuildId, user.Id))
+      [Command, Summary("Blacklists user from bot usage")]
+      public async Task BlacklistUser(IGuildUser user, [Remainder] string reason = "None")
       {
-        var embed = new EmbedBuilder();
-        embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
-        embed.WithDescription("User blacklisted");
-        embed.AddField("Judge", Context.User.Username, true);
-        embed.AddField("Reason", reason, true);
+        if (BlacklistResource.Instance.Push(user.GuildId, user.Id))
+        {
+          var embed = new EmbedBuilder();
+          embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
+          embed.WithDescription("User blacklisted");
+          embed.AddField("Judge", Context.User.Username, true);
+          embed.AddField("Reason", reason, true);
 
-        await ReplyAsync("", false, embed.Build());
+          await ReplyAsync("", false, embed.Build());
+        }
+      }
+
+      [Command("remove"), Summary("Remove user from blacklist")]
+      public async Task WhitelistUser(IGuildUser user)
+      {
+        if (BlacklistResource.Instance.Pop(user.GuildId, user.Id))
+        {
+          await ReplyAsync($"{Context.User.Mention} restored bot access to {user.Mention}");
+        }
       }
     }
+    #endregion
 
-    [Command("whitelist"), Alias("wl"), Summary("Restore bot access to user")]
+    #region Timeout
+    [Group("timeout")]
     [RequireUserPermission(GuildPermission.Administrator)]
-    public async Task WhitelistUser(IGuildUser user)
+    public class Timeout : ModuleBase<SocketCommandContext>
     {
-      if (BlacklistResource.Instance.Pop(user.GuildId, user.Id))
+      [Command, Summary("Sets the specified user in timeout")]
+      [RequireBotPermission(GuildPermission.ManageRoles)]
+      public async Task TimeoutUser(IGuildUser user, uint minutes = 10)
       {
-        await ReplyAsync($"{Context.User.Mention} restored bot access to {user.Mention}");
+        if (minutes == 0)
+        {
+          minutes = (uint)new Random((int)LogUtil.ToUnixTime()).Next(10, 5000);
+        }
+        if (TimeoutResource.Instance.SetTimeout(user, minutes))
+        {
+          var embed = new EmbedBuilder();
+          embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
+          embed.WithDescription("User set on timeout");
+          embed.AddField("Judge", Context.User.Username, true);
+          embed.AddField("Minutes", minutes, true);
+
+          await ReplyAsync("", false, embed.Build());
+        }
+      }
+
+      [Command("remove"), Summary("Removes timeout from specified user")]
+      [RequireBotPermission(GuildPermission.ManageRoles)]
+      public async Task UntimeoutUser(IGuildUser user)
+      {
+        if (!TimeoutResource.Instance.UnsetTimeout(user))
+        {
+          await Context.User.SendMessageAsync($"Couldn't remove {user.Username} from timeout");
+        }
       }
     }
+    #endregion
 
-    [Command("timeout"), Summary("Sets the specified user in timeout")]
-    [RequireBotPermission(GuildPermission.ManageRoles)]
-    [RequireBotPermission(GuildPermission.Administrator)]
-    public async Task TimeoutUser(IGuildUser user, uint minutes = 10)
-    {
-      if (minutes == 0)
-      {
-        minutes = (uint)new Random((int)LogUtil.ToUnixTime()).Next(10, 5000);
-      }
-      if (TimeoutResource.Instance.SetTimeout(user, minutes))
-      {
-        var embed = new EmbedBuilder();
-        embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
-        embed.WithDescription("User set on timeout");
-        embed.AddField("Judge", Context.User.Username, true);
-        embed.AddField("Minutes", minutes, true);
-
-        await ReplyAsync("", false, embed.Build());
-      }
-    }
-
-    [Command("untimeout"), Summary("Removes timeout from specified user")]
-    [RequireBotPermission(GuildPermission.ManageRoles)]
+    #region Mark
+    [Group("mark")]
     [RequireUserPermission(GuildPermission.Administrator)]
-    public async Task UntimeoutUser(IGuildUser user)
+    public class Mark : ModuleBase<SocketCommandContext>
     {
-      if (!TimeoutResource.Instance.UnsetTimeout(user))
+      [Command, Summary("Marks specified user")]
+      [RequireBotPermission(GuildPermission.ManageNicknames)]
+      public async Task MarkUser(IGuildUser user)
       {
-        await Context.User.SendMessageAsync($"Couldn't remove {user.Username} from timeout");
+        if (MarkResource.Instance.Push(user.GuildId, user.Id))
+        {
+          var mark = Config.Bot.Guilds[user.GuildId].Mark;
+          await MarkResource.Instance.CheckSet(user, mark);
+        }
+      }
+
+      [Command("remove"), Summary("Unmark specified user")]
+      [RequireBotPermission(GuildPermission.ManageNicknames)]
+      public async Task UnmarkUser(IGuildUser user)
+      {
+        if (MarkResource.Instance.Pop(user.GuildId, user.Id))
+        {
+          try
+          {
+            await user.ModifyAsync(x => x.Nickname = "");
+          }
+          catch (Discord.Net.HttpException e)
+          {
+            LogUtil.Write("Mark:UnmarkUser", e.Message);
+          }
+        }
       }
     }
+    #endregion
   }
 }

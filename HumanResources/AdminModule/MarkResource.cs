@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Timers;
 
-namespace HumanResources.MarkModule
+namespace HumanResources.AdminModule
 {
   public sealed class MarkResource : IStaticResource
   {
@@ -72,7 +72,7 @@ namespace HumanResources.MarkModule
 
     public bool Contains(ulong gid, ulong uid) => this.List.ContainsKey(gid) && this.List[gid].Contains(uid);
 
-    public bool RemoveGuild(ulong gid) => this.List.Remove(gid);
+    public bool Remove(ulong gid) => this.List.Remove(gid);
 
     public async Task Start()
     {

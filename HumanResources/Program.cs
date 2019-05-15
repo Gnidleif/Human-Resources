@@ -3,7 +3,6 @@ using HumanResources.Utilities;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using HumanResources.MarkModule;
 using System.Collections.Generic;
 using HumanResources.AdminModule;
 
@@ -13,7 +12,6 @@ namespace HumanResources
   {
     private CommandHandler Handler { get; set; }
     private List<IStaticResource> Resources { get; set; }
-
     private static void Main(string[] args) => new Program().MainAsync().GetAwaiter().GetResult();
 
     public async Task MainAsync()
@@ -60,11 +58,11 @@ namespace HumanResources
       }
 
       this.Resources = new List<IStaticResource>
-            {
-                MarkResource.Instance,
-                BlacklistResource.Instance,
-                TimeoutResource.Instance,
-            };
+      {
+        MarkResource.Instance,
+        BlacklistResource.Instance,
+        TimeoutResource.Instance,
+      };
       AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
 
       this.Handler = new CommandHandler();
@@ -94,7 +92,7 @@ namespace HumanResources
         LogUtil.Write("Client_LeftGuild", $"Successfully removed {arg.Id} from Config");
       }
 
-      if (MarkResource.Instance.RemoveGuild(arg.Id))
+      if (MarkResource.Instance.Remove(arg.Id))
       {
         LogUtil.Write("Client_LeftGuild", $"Successfully removed {arg.Id} from MarkHandler");
       }

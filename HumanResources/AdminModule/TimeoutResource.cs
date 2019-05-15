@@ -66,7 +66,7 @@ namespace HumanResources.AdminModule
 
     public bool Contains(ulong gid, ulong uid) => this.List.ContainsKey(gid) && this.List[gid].ContainsKey(uid);
 
-    public bool RemoveGuild(ulong gid) => this.List.Remove(gid);
+    public bool Remove(ulong gid) => this.List.Remove(gid);
 
     public bool Pop(ulong gid, ulong uid)
     {
@@ -99,7 +99,7 @@ namespace HumanResources.AdminModule
       var u = g?.GetUser(uid);
       if (g == null)
       {
-        this.RemoveGuild(gid);
+        this.Remove(gid);
       }
       else if (u == null)
       {

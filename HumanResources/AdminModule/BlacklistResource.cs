@@ -67,6 +67,6 @@ namespace HumanResources.AdminModule
 
     public bool Contains(ulong gid, ulong uid) => this.List.ContainsKey(gid) && this.List[gid].Contains(uid);
 
-    public bool RemoveGuild(ulong gid) => this.List.Remove(gid);
+    public bool Remove(ulong gid) => this.List.Remove(gid);
   }
 }
