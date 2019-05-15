@@ -35,7 +35,6 @@ namespace HumanResources
       });
 
       Global.Client.GuildMemberUpdated += Client_GuildMemberUpdated;
-      //Global.Client.LatencyUpdated += Client_LatencyUpdated;
       Global.Client.Log += Client_Log;
       Global.Client.LeftGuild += Client_LeftGuild;
       Global.Client.JoinedGuild += Client_JoinedGuild;
