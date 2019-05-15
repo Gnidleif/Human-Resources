@@ -118,8 +118,8 @@ namespace HumanResources
       foreach(var r in this.Resources)
       {
         await r.Initialize();
+        _ = r.Save();
       }
-      this.Resources.ForEach(x => x.Save());
 
       await Task.CompletedTask;
     }
