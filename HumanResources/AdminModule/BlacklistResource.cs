@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HumanResources.AdminModule
 {
@@ -19,7 +20,7 @@ namespace HumanResources.AdminModule
     {
     }
 
-    public void Initialize()
+    public async Task Initialize()
     {
       if (!Directory.Exists(Global.ResourceFolder))
       {
@@ -30,6 +31,7 @@ namespace HumanResources.AdminModule
       {
         this.List = temp;
       }
+      await Task.CompletedTask;
     }
 
     public bool Save() => JsonUtil.TryWrite(this.Path, this.List);

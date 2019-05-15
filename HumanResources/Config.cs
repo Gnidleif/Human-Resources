@@ -61,7 +61,6 @@ namespace HumanResources
       return false;
     }
   }
-
   public struct BotConfig
   {
     public string Token;

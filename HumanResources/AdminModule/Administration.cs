@@ -9,10 +9,10 @@ namespace HumanResources.AdminModule
   public class Administration : ModuleBase<SocketCommandContext>
   {
     #region General
-    [Command("kick"), Alias("k"), Summary("Kicks specified user")]
+    [Command("kick"), Alias("k"), Summary("Kicks the specified user")]
     [RequireBotPermission(GuildPermission.KickMembers)]
     [RequireUserPermission(GuildPermission.KickMembers)]
-    public async Task KickUser(IGuildUser user, [Remainder] string reason = "None")
+    public async Task KickUser([Summary("The user to kick")] IGuildUser user, [Summary("The reason for the kick")] [Remainder] string reason = "")
     {
       try
       {
@@ -21,21 +21,26 @@ namespace HumanResources.AdminModule
       catch (Discord.Net.HttpException e)
       {
         LogUtil.Write("Administration:KickUser", e.Message);
+        await Context.User.SendMessageAsync(e.Message);
+        return;
       }
 
       var embed = new EmbedBuilder();
       embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
       embed.WithDescription("User kicked");
       embed.AddField("Judge", Context.User.Username, true);
-      embed.AddField("Reason", reason, true);
+      if (!string.IsNullOrEmpty(reason))
+      {
+        embed.AddField("Reason", reason, true);
+      }
 
       await ReplyAsync("", false, embed.Build());
     }
 
-    [Command("ban"), Alias("b"), Summary("Bans specified user")]
+    [Command("ban"), Alias("b"), Summary("Bans the specified user")]
     [RequireBotPermission(GuildPermission.BanMembers)]
     [RequireUserPermission(GuildPermission.BanMembers)]
-    public async Task BanUser(IGuildUser user, [Remainder] string reason = "None")
+    public async Task BanUser([Summary("The user to ban")] IGuildUser user, [Summary("The reason for the ban")] [Remainder] string reason = "")
     {
       try
       {
@@ -44,13 +49,18 @@ namespace HumanResources.AdminModule
       catch (Discord.Net.HttpException e)
       {
         LogUtil.Write("Administration:BanUser", e.Message);
+        await Context.User.SendMessageAsync(e.Message);
+        return;
       }
 
       var embed = new EmbedBuilder();
       embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
       embed.WithDescription("User banned");
       embed.AddField("Judge", Context.User.Username, true);
-      embed.AddField("Reason", reason, true);
+      if (!string.IsNullOrEmpty(reason))
+      {
+        embed.AddField("Reason", reason, true);
+      }
 
       await ReplyAsync("", false, embed.Build());
     }
@@ -58,7 +68,7 @@ namespace HumanResources.AdminModule
     [Command("voicekick"), Alias("vk"), Summary("Disconnect user from voice chat")]
     [RequireBotPermission(GuildPermission.ManageChannels | GuildPermission.MoveMembers)]
     [RequireUserPermission(GuildPermission.KickMembers)]
-    public async Task VoiceKickUser(IGuildUser user, [Remainder] string reason = "None")
+    public async Task VoiceKickUser([Summary("The user to voice kick")] IGuildUser user, [Summary("The reason for the voice kick")] [Remainder] string reason = "")
     {
       if (user.VoiceChannel == null)
       {
@@ -75,25 +85,30 @@ namespace HumanResources.AdminModule
       catch (Discord.Net.HttpException e)
       {
         LogUtil.Write("Administration:VoiceKickUser", e.Message);
+        await Context.User.SendMessageAsync(e.Message);
+        return;
       }
 
       var embed = new EmbedBuilder();
       embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
       embed.WithDescription("User voice kicked");
       embed.AddField("Judge", Context.User.Username, true);
-      embed.AddField("Reason", reason, true);
+      if (!string.IsNullOrEmpty(reason))
+      {
+        embed.AddField("Reason", reason, true);
+      }
 
       await ReplyAsync("", false, embed.Build());
     }
     #endregion
 
     #region Blacklist
-    [Group("blacklist")]
+    [Group("blacklist"), Summary("Handles the guild blacklist")]
     [RequireUserPermission(GuildPermission.Administrator)]
     public class Blacklist : ModuleBase<SocketCommandContext>
     {
       [Command, Summary("Blacklists user from bot usage")]
-      public async Task BlacklistUser(IGuildUser user, [Remainder] string reason = "None")
+      public async Task BlacklistUser([Summary("The user to blacklist")] IGuildUser user, [Summary("The reason for the blacklisting")] [Remainder] string reason = "")
       {
         if (BlacklistResource.Instance.Push(user.GuildId, user.Id))
         {
@@ -101,38 +116,42 @@ namespace HumanResources.AdminModule
           embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
           embed.WithDescription("User blacklisted");
           embed.AddField("Judge", Context.User.Username, true);
-          embed.AddField("Reason", reason, true);
+          if (!string.IsNullOrEmpty(reason))
+          {
+            embed.AddField("Reason", reason, true);
+          }
 
           await ReplyAsync("", false, embed.Build());
         }
       }
 
       [Command("remove"), Summary("Remove user from blacklist")]
-      public async Task WhitelistUser(IGuildUser user)
+      public async Task WhitelistUser([Summary("The user to blacklist")] IGuildUser user)
       {
-        if (BlacklistResource.Instance.Pop(user.GuildId, user.Id))
+        if (!BlacklistResource.Instance.Pop(user.GuildId, user.Id))
         {
-          await ReplyAsync($"{Context.User.Mention} restored bot access to {user.Mention}");
+          await Context.User.SendMessageAsync($"{user.Username} is already blacklisted");
         }
       }
     }
     #endregion
 
     #region Timeout
-    [Group("timeout")]
+    [Group("timeout"), Summary("Handles putting and removing people from timeout")]
     [RequireUserPermission(GuildPermission.Administrator)]
     public class Timeout : ModuleBase<SocketCommandContext>
     {
       [Command, Summary("Sets the specified user in timeout")]
       [RequireBotPermission(GuildPermission.ManageRoles)]
-      public async Task TimeoutUser(IGuildUser user, uint minutes = 10)
+      public async Task TimeoutUser([Summary("The user to set on timeout")] IGuildUser user, [Summary("Minutes the timeout will last, 0 gives a random number between 10 and 5000")] uint minutes = 10)
       {
         if (minutes == 0)
         {
           minutes = (uint)new Random((int)LogUtil.ToUnixTime()).Next(10, 5000);
         }
-        if (TimeoutResource.Instance.SetTimeout(user, minutes))
+        try
         {
+          await TimeoutResource.Instance.SetTimeout(user, minutes);
           var embed = new EmbedBuilder();
           embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
           embed.WithDescription("User set on timeout");
@@ -141,33 +160,53 @@ namespace HumanResources.AdminModule
 
           await ReplyAsync("", false, embed.Build());
         }
+        catch(Exception e)
+        {
+          LogUtil.Write("Timeout:TimeoutUser", e.Message);
+        }
       }
 
       [Command("remove"), Summary("Removes timeout from specified user")]
       [RequireBotPermission(GuildPermission.ManageRoles)]
-      public async Task UntimeoutUser(IGuildUser user)
+      public async Task UntimeoutUser([Summary("The user to remove from timeout")] IGuildUser user)
       {
-        if (!TimeoutResource.Instance.UnsetTimeout(user))
+        try
         {
+          await TimeoutResource.Instance.UnsetTimeout(user);
           await Context.User.SendMessageAsync($"Couldn't remove {user.Username} from timeout");
+        }
+        catch (Exception e)
+        {
+          LogUtil.Write("Timeout:UntimeoutUser", e.Message);
         }
       }
     }
     #endregion
 
     #region Mark
-    [Group("mark")]
+    [Group("mark"), Summary("Handles marking specific users on the guild")]
     [RequireUserPermission(GuildPermission.Administrator)]
     public class Mark : ModuleBase<SocketCommandContext>
     {
       [Command, Summary("Marks specified user")]
       [RequireBotPermission(GuildPermission.ManageNicknames)]
-      public async Task MarkUser(IGuildUser user)
+      public async Task MarkUser([Summary("The user to set a mark on")] IGuildUser user, [Summary("The reason for marking the user")] string reason = "")
       {
         if (MarkResource.Instance.Push(user.GuildId, user.Id))
         {
           var mark = Config.Bot.Guilds[user.GuildId].Mark;
           await MarkResource.Instance.CheckSet(user, mark);
+
+          var embed = new EmbedBuilder();
+          embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
+          embed.WithDescription("User marked");
+          embed.AddField("Judge", Context.User.Username, true);
+          if (!string.IsNullOrEmpty(reason))
+          {
+            embed.AddField("Reason", reason, true);
+          }
+
+          await ReplyAsync("", false, embed.Build());
         }
       }
 

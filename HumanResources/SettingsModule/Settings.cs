@@ -70,7 +70,6 @@ namespace HumanResources.Settings
       };
       if (Config.Update(Context.Guild.Id, newCfg))
       {
-        MarkResource.Instance.MarkAll();
         await ReplyAsync($":white_check_mark: Successfully set mark to **{mark}**");
       }
       else

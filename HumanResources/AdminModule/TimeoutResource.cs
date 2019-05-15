@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Timers;
 
 namespace HumanResources.AdminModule
@@ -22,7 +23,7 @@ namespace HumanResources.AdminModule
     {
     }
 
-    public void Initialize()
+    public async Task Initialize()
     {
       if (!Directory.Exists(Global.ResourceFolder))
       {
@@ -54,6 +55,7 @@ namespace HumanResources.AdminModule
           }
         }
       }
+      await Task.CompletedTask;
     }
 
     public bool Close()
@@ -93,7 +95,7 @@ namespace HumanResources.AdminModule
 
     public bool Save() => JsonUtil.TryWrite(this.Path, this.List);
 
-    private void UnknownUnset(ulong gid, ulong uid)
+    private async Task UnknownUnset(ulong gid, ulong uid)
     {
       var g = Global.Client.GetGuild(gid);
       var u = g?.GetUser(uid);
@@ -107,7 +109,7 @@ namespace HumanResources.AdminModule
       }
       else
       {
-        this.UnsetTimeout(u);
+        await this.UnsetTimeout(u);
       }
     }
 
@@ -126,12 +128,12 @@ namespace HumanResources.AdminModule
       };
       tick.Elapsed += (object sender, ElapsedEventArgs e) =>
       {
-        this.UnknownUnset(gid, uid);
+        _ = this.UnknownUnset(gid, uid);
       };
       return tick;
     }
 
-    public bool SetTimeout(IGuildUser user, uint minutes)
+    public async Task SetTimeout(IGuildUser user, uint minutes)
     {
       var time = DateTime.Now.AddMinutes(minutes);
       var roleIds = user.RoleIds.ToList();
@@ -150,8 +152,15 @@ namespace HumanResources.AdminModule
       };
       if (this.List[gid][uid].Tick == null)
       {
-        this.UnsetTimeout(user);
-        return false;
+        try
+        {
+          await this.UnsetTimeout(user);
+        }
+        catch (Exception e)
+        {
+          throw e;
+        }
+        return;
       }
 
       try
@@ -160,21 +169,20 @@ namespace HumanResources.AdminModule
             .Select(x => user.Guild.GetRole(x))
             .Where(x => !x.IsManaged && x != user.Guild.EveryoneRole)
             .ToList();
-        _ = user.RemoveRolesAsync(roles);
+        await user.RemoveRolesAsync(roles);
       }
       catch (Exception e)
       {
         LogUtil.Write("TimeoutResource:SetTimeout", e.Message);
+        throw e;
       }
-
-      return true;
     }
 
-    public bool UnsetTimeout(IGuildUser user)
+    public async Task UnsetTimeout(IGuildUser user)
     {
       if (!this.Contains(user.GuildId, user.Id))
       {
-        return false;
+        return;
       }
       try
       {
@@ -182,14 +190,13 @@ namespace HumanResources.AdminModule
             .Select(x => user.Guild.GetRole(x))
             .Where(x => !x.IsManaged && x != user.Guild.EveryoneRole)
             .ToList();
-        _ = user.AddRolesAsync(roles);
+        await user.AddRolesAsync(roles);
       }
       catch (Exception e)
       {
         LogUtil.Write("TimeoutResource:UnsetTimeout", e.Message);
+        throw e;
       }
-      LogUtil.Write("TimeoutResource:UnsetTimeout", $"Timeout removed for: {user.Username} on {user.Guild.Name}");
-      return this.Pop(user.GuildId, user.Id);
     }
   }
 

@@ -1,8 +1,10 @@
-﻿namespace HumanResources
+﻿using System.Threading.Tasks;
+
+namespace HumanResources
 {
   public interface IStaticResource
   {
-    void Initialize();
+    Task Initialize();
     bool Save();
     bool Close();
     bool Push(ulong gid, ulong uid);

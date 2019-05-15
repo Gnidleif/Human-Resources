@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using HumanResources.AdminModule;
+using Discord;
 
 namespace HumanResources
 {
@@ -33,6 +34,7 @@ namespace HumanResources
         LogLevel = Discord.LogSeverity.Verbose,
       });
 
+      Global.Client.GuildMemberUpdated += Client_GuildMemberUpdated;
       //Global.Client.LatencyUpdated += Client_LatencyUpdated;
       Global.Client.Log += Client_Log;
       Global.Client.LeftGuild += Client_LeftGuild;
@@ -71,12 +73,17 @@ namespace HumanResources
       await Task.Delay(-1);
     }
 
-    private async Task Client_LatencyUpdated(int arg1, int arg2)
+    private async Task Client_GuildMemberUpdated(SocketGuildUser arg1, SocketGuildUser arg2)
     {
-      _ = Config.Save();
-      this.Resources.ForEach(x => x.Close());
-
-      await Task.CompletedTask;
+      if (string.Compare(arg1.Nickname, arg2.Nickname) == 0)
+      {
+        return;
+      }
+      var user = arg2 as IGuildUser;
+      if (MarkResource.Instance.Contains(user.GuildId, user.Id))
+      {
+        await MarkResource.Instance.CheckSet(user, Config.Bot.Guilds[user.GuildId].Mark);
+      }
     }
 
     private async Task Client_Log(Discord.LogMessage arg)
@@ -87,15 +94,8 @@ namespace HumanResources
 
     private async Task Client_LeftGuild(SocketGuild arg)
     {
-      if (Config.Pop(arg.Id))
-      {
-        LogUtil.Write("Client_LeftGuild", $"Successfully removed {arg.Id} from Config");
-      }
-
-      if (MarkResource.Instance.Remove(arg.Id))
-      {
-        LogUtil.Write("Client_LeftGuild", $"Successfully removed {arg.Id} from MarkHandler");
-      }
+      _ = Config.Pop(arg.Id);
+      this.Resources.ForEach(x => x.Remove(arg.Id));
 
       await Task.CompletedTask;
     }
@@ -112,16 +112,14 @@ namespace HumanResources
 
     private async Task Client_Ready()
     {
-      foreach (var id in Global.Client.Guilds.Select(x => x.Id))
-      {
-        _ = Config.Push(id);
-      }
+      Global.Client.Guilds.Select(x => x.Id).ToList().ForEach(id => Config.Push(id));
 
       _ = Config.Save();
-      this.Resources.ForEach(x => x.Initialize());
+      foreach(var r in this.Resources)
+      {
+        await r.Initialize();
+      }
       this.Resources.ForEach(x => x.Save());
-
-      MarkResource.Instance.MarkAll();
 
       await Task.CompletedTask;
     }

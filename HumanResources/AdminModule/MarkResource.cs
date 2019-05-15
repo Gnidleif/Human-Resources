@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Timers;
 
 namespace HumanResources.AdminModule
 {
@@ -14,7 +13,6 @@ namespace HumanResources.AdminModule
   {
     private static readonly Lazy<MarkResource> lazy = new Lazy<MarkResource>(() => new MarkResource());
     private const string Name = "marked.json";
-    private Timer ValidateTimer;
     private readonly string Path = $"{Global.ResourceFolder}/{Name}";
     private Dictionary<ulong, HashSet<ulong>> List { get; set; }
 
@@ -24,7 +22,7 @@ namespace HumanResources.AdminModule
     {
     }
 
-    public void Initialize()
+    public async Task Initialize()
     {
       if (!Directory.Exists(Global.ResourceFolder))
       {
@@ -34,6 +32,24 @@ namespace HumanResources.AdminModule
       if (File.Exists(this.Path) ? JsonUtil.TryRead(this.Path, out temp) : JsonUtil.TryWrite(this.Path, temp))
       {
         this.List = temp;
+        foreach (var gid in this.List.Keys)
+        {
+          var mark = Config.Bot.Guilds[gid].Mark;
+          var guild = Global.Client.GetGuild(gid);
+          if (guild == null)
+          {
+            continue;
+          }
+          foreach (var uid in this.List[gid])
+          {
+            var user = guild.GetUser(uid);
+            if (user == null)
+            {
+              continue;
+            }
+            await this.CheckSet(user, mark);
+          }
+        }
       }
     }
 
@@ -74,54 +90,12 @@ namespace HumanResources.AdminModule
 
     public bool Remove(ulong gid) => this.List.Remove(gid);
 
-    public async Task Start()
-    {
-      ValidateTimer = new Timer()
-      {
-        Interval = 60 * 1000,
-        AutoReset = true,
-        Enabled = true,
-      };
-      ValidateTimer.Elapsed += ValidateTimer_Elapsed;
-      LogUtil.Write("MarkHandler:Start", "Mark validation started");
-
-      await Task.CompletedTask;
-    }
-
-    private void ValidateTimer_Elapsed(object sender, ElapsedEventArgs e)
-    {
-      this.MarkAll();
-      _ = this.Save();
-    }
-
-    public void MarkAll()
-    {
-      foreach (var gid in this.List.Keys)
-      {
-        var mark = Config.Bot.Guilds[gid].Mark;
-        var guild = Global.Client.GetGuild(gid);
-        if (guild == null)
-        {
-          continue;
-        }
-        foreach (var uid in this.List[gid])
-        {
-          var user = guild.GetUser(uid);
-          if (user == null)
-          {
-            continue;
-          }
-          _ = this.CheckSet(user, mark);
-        }
-      }
-    }
-
     public async Task CheckSet(IGuildUser user, char mark)
     {
-      var preferred = $"{mark} {user.Username}";
       var rgx = new Regex($"^[{mark}] {user.Username}$");
       if (string.IsNullOrEmpty(user.Nickname) || !rgx.IsMatch(user.Nickname))
       {
+        var preferred = $"{mark} {user.Username}";
         try
         {
           await user.ModifyAsync(x => x.Nickname = preferred);
