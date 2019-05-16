@@ -34,7 +34,7 @@ namespace HumanResources
       }
 
       var ctx = new SocketCommandContext(Global.Client, msg);
-      if (ctx.User.IsBot || BlacklistResource.Instance.Contains(ctx.Guild.Id, ctx.User.Id))
+      if (ctx.User.IsBot || MarkResource.Instance.Contains(ctx.Guild.Id, ctx.User.Id) || BlacklistResource.Instance.Contains(ctx.Guild.Id, ctx.User.Id))
       {
         return;
       }

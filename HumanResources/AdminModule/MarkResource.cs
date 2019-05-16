@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.WebSocket;
 using HumanResources.Utilities;
 using System;
 using System.Collections.Generic;
@@ -51,6 +52,8 @@ namespace HumanResources.AdminModule
           }
         }
       }
+
+      Global.Client.GuildMemberUpdated += Client_GuildMemberUpdated;
     }
 
     public bool Save() => JsonUtil.TryWrite(this.Path, this.List);
@@ -105,6 +108,19 @@ namespace HumanResources.AdminModule
           LogUtil.Write("MarkHandler:CheckSet", e.Message);
           _ = this.Pop(user.GuildId, user.Id);
         }
+      }
+    }
+
+    private async Task Client_GuildMemberUpdated(SocketGuildUser arg1, SocketGuildUser arg2)
+    {
+      if (string.Compare(arg1.Nickname, arg2.Nickname) == 0)
+      {
+        return;
+      }
+      var user = arg2 as IGuildUser;
+      if (MarkResource.Instance.Contains(user.GuildId, user.Id))
+      {
+        await MarkResource.Instance.CheckSet(user, Config.Bot.Guilds[user.GuildId].Mark);
       }
     }
   }

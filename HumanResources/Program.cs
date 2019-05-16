@@ -20,13 +20,7 @@ namespace HumanResources
       if (string.IsNullOrEmpty(Config.Bot.Token))
       {
         Console.WriteLine("No token detected, please provide a valid token:");
-        var input = Console.ReadLine();
-        Config.Bot = new BotConfig
-        {
-          Token = input,
-          TimeFormat = Config.Bot.TimeFormat,
-          Guilds = Config.Bot.Guilds,
-        };
+        Config.Bot.Token = Console.ReadLine();
       }
 
       Global.Client = new DiscordSocketClient(new DiscordSocketConfig
@@ -34,7 +28,6 @@ namespace HumanResources
         LogLevel = Discord.LogSeverity.Verbose,
       });
 
-      Global.Client.GuildMemberUpdated += Client_GuildMemberUpdated;
       Global.Client.Log += Client_Log;
       Global.Client.LeftGuild += Client_LeftGuild;
       Global.Client.JoinedGuild += Client_JoinedGuild;
@@ -70,19 +63,6 @@ namespace HumanResources
       await this.Handler.InitializeAsync();
 
       await Task.Delay(-1);
-    }
-
-    private async Task Client_GuildMemberUpdated(SocketGuildUser arg1, SocketGuildUser arg2)
-    {
-      if (string.Compare(arg1.Nickname, arg2.Nickname) == 0)
-      {
-        return;
-      }
-      var user = arg2 as IGuildUser;
-      if (MarkResource.Instance.Contains(user.GuildId, user.Id))
-      {
-        await MarkResource.Instance.CheckSet(user, Config.Bot.Guilds[user.GuildId].Mark);
-      }
     }
 
     private async Task Client_Log(Discord.LogMessage arg)

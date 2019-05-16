@@ -8,7 +8,6 @@ namespace HumanResources
   {
     private const string Name = "config.json";
     private static readonly string Path = $"{Global.ResourceFolder}/{Name}";
-    private static GuildConfig DefaultGuildConfig { get { return new GuildConfig { Prefix = '!', Mark = '⭐', }; } }
 
     public static BotConfig Bot { get; set; }
 
@@ -18,22 +17,10 @@ namespace HumanResources
       {
         Directory.CreateDirectory(Global.ResourceFolder);
       }
-      var temp = new BotConfig
-      {
-        TimeFormat = "yyyy-MM-dd HH:mm:ss",
-      };
+      var temp = new BotConfig();
       if (File.Exists(Path) ? JsonUtil.TryRead(Path, out temp) : JsonUtil.TryWrite(Path, temp))
       {
         Bot = temp;
-        if (Bot.Guilds == null)
-        {
-          Bot = new BotConfig
-          {
-            Token = Bot.Token,
-            TimeFormat = Bot.TimeFormat,
-            Guilds = new Dictionary<ulong, GuildConfig>(),
-          };
-        }
       }
     }
 
@@ -43,7 +30,7 @@ namespace HumanResources
     {
       if (!Bot.Guilds.ContainsKey(id))
       {
-        Bot.Guilds.Add(id, DefaultGuildConfig);
+        Bot.Guilds.Add(id, new GuildConfig());
         return true;
       }
       return false;
@@ -61,16 +48,17 @@ namespace HumanResources
       return false;
     }
   }
-  public struct BotConfig
+  public class BotConfig
   {
-    public string Token;
-    public string TimeFormat;
-    public Dictionary<ulong, GuildConfig> Guilds;
+    public string Token { get; set; }
+    public string TimeFormat { get; set; } = "yyyy-MM-dd HH:mm:ss";
+    public Dictionary<ulong, GuildConfig> Guilds { get; set; } = new Dictionary<ulong, GuildConfig>();
   }
 
-  public struct GuildConfig
+  public class GuildConfig
   {
-    public char Prefix;
-    public char Mark;
+    public char Prefix { get; set; } = '!';
+    public char Mark { get; set; } = '⭐';
+    public bool Marklist { get; set; } = false;
   }
 }

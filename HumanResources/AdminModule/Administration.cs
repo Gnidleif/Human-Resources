@@ -64,41 +64,158 @@ namespace HumanResources.AdminModule
 
       await ReplyAsync("", false, embed.Build());
     }
+    #endregion
 
-    [Command("voicekick"), Alias("vk"), Summary("Disconnect user from voice chat")]
-    [RequireBotPermission(GuildPermission.ManageChannels | GuildPermission.MoveMembers)]
-    [RequireUserPermission(GuildPermission.KickMembers)]
-    public async Task VoiceKickUser([Summary("The user to voice kick")] IGuildUser user, [Summary("The reason for the voice kick")] [Remainder] string reason = "")
+    #region Voice
+    [Group("voice")]
+    public class Voice : ModuleBase<SocketCommandContext>
     {
-      if (user.VoiceChannel == null)
+      [Command("kick"), Summary("Disconnect user from voice chat")]
+      [RequireBotPermission(GuildPermission.ManageChannels | GuildPermission.MoveMembers)]
+      [RequireUserPermission(GuildPermission.KickMembers)]
+      public async Task KickUser([Summary("The user to voice kick")] IGuildUser user, [Summary("The reason for the voice kick")] [Remainder] string reason = "")
       {
-        await Context.User.SendMessageAsync($"{user.Username} is not connected to a voice channel");
-        return;
-      }
+        if (user.VoiceChannel == null)
+        {
+          await Context.User.SendMessageAsync($"{user.Username} is not connected to a voice channel");
+          return;
+        }
 
-      try
-      {
         var temp = await Context.Guild.CreateVoiceChannelAsync(LogUtil.ToUnixTime().ToString());
-        await user.ModifyAsync(x => x.ChannelId = temp.Id);
-        await temp.DeleteAsync();
-      }
-      catch (Discord.Net.HttpException e)
-      {
-        LogUtil.Write("Administration:VoiceKickUser", e.Message);
-        await Context.User.SendMessageAsync(e.Message);
-        return;
+        try
+        {
+          await user.ModifyAsync(x => x.Channel = temp);
+        }
+        catch (Discord.Net.HttpException e)
+        {
+          LogUtil.Write("Voice:KickUser", e.Message);
+          await Context.User.SendMessageAsync(e.Message);
+          return;
+        }
+        finally
+        {
+          await temp.DeleteAsync();
+        }
+
+        var embed = new EmbedBuilder();
+        embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
+        embed.WithDescription("User voice kicked");
+        embed.AddField("Judge", Context.User.Username, true);
+        if (!string.IsNullOrEmpty(reason))
+        {
+          embed.AddField("Reason", reason, true);
+        }
+
+        await ReplyAsync("", false, embed.Build());
       }
 
-      var embed = new EmbedBuilder();
-      embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
-      embed.WithDescription("User voice kicked");
-      embed.AddField("Judge", Context.User.Username, true);
-      if (!string.IsNullOrEmpty(reason))
+      [Command("mute"), Summary("Mutes the specified user")]
+      [RequireBotPermission(GuildPermission.MuteMembers)]
+      [RequireUserPermission(GuildPermission.MuteMembers)]
+      public async Task MuteUser([Summary("The user to mute")] IGuildUser user, [Summary("The reason for the mute")] [Remainder] string reason = "")
       {
-        embed.AddField("Reason", reason, true);
+        if (user.IsMuted == true || user.VoiceChannel == null)
+        {
+          await Context.User.SendMessageAsync($"Unable to mute {user.Username}");
+          return;
+        }
+        try
+        {
+          await user.ModifyAsync(x => x.Mute = true);
+        }
+        catch (Exception e)
+        {
+          LogUtil.Write("Voice:MuteUser", e.Message);
+          await Context.User.SendMessageAsync(e.Message);
+          return;
+        }
+
+        var embed = new EmbedBuilder();
+        embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
+        embed.WithDescription("User muted");
+        embed.AddField("Judge", Context.User.Username, true);
+        if (!string.IsNullOrEmpty(reason))
+        {
+          embed.AddField("Reason", reason, true);
+        }
+
+        await ReplyAsync("", false, embed.Build());
       }
 
-      await ReplyAsync("", false, embed.Build());
+      [Command("unmute"), Summary("Unmutes the specified user")]
+      [RequireBotPermission(GuildPermission.MuteMembers)]
+      [RequireUserPermission(GuildPermission.MuteMembers)]
+      public async Task UnmuteUser([Summary("The user to unmute")] IGuildUser user)
+      {
+        if (user.IsSelfMuted == true || user.IsMuted == false || user.VoiceChannel == null)
+        {
+          await Context.User.SendMessageAsync($"Unable to unmute {user.Username}");
+        }
+        try
+        {
+          await user.ModifyAsync(x => x.Mute = false);
+        }
+        catch (Exception e)
+        {
+          LogUtil.Write("Voice:UnmuteUser", e.Message);
+          await Context.User.SendMessageAsync(e.Message);
+          return;
+        }
+      }
+
+      [Command("deafen"), Summary("Deafens the specified user")]
+      [RequireBotPermission(GuildPermission.DeafenMembers)]
+      [RequireUserPermission(GuildPermission.DeafenMembers)]
+      public async Task DeafenUser([Summary("The user to deafen")] IGuildUser user, [Summary("The reason for the deafening")] [Remainder] string reason = "")
+      {
+        if (user.IsDeafened == true || user.VoiceChannel == null)
+        {
+          await Context.User.SendMessageAsync($"Unable to deafen {user.Username}");
+          return;
+        }
+        try
+        {
+          await user.ModifyAsync(x => x.Deaf = true);
+        }
+        catch (Exception e)
+        {
+          LogUtil.Write("Voice:DeafenUser", e.Message);
+          await Context.User.SendMessageAsync(e.Message);
+          return;
+        }
+
+        var embed = new EmbedBuilder();
+        embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
+        embed.WithDescription("User deafened");
+        embed.AddField("Judge", Context.User.Username, true);
+        if (!string.IsNullOrEmpty(reason))
+        {
+          embed.AddField("Reason", reason, true);
+        }
+
+        await ReplyAsync("", false, embed.Build());
+      }
+
+      [Command("undeafen"), Summary("Undeafens the specified user")]
+      [RequireBotPermission(GuildPermission.MuteMembers)]
+      [RequireUserPermission(GuildPermission.MuteMembers)]
+      public async Task UndeafenUser([Summary("The user to undeafen")] IGuildUser user)
+      {
+        if (user.IsSelfDeafened == true || user.IsDeafened == false || user.VoiceChannel == null)
+        {
+          await Context.User.SendMessageAsync($"Unable to undeafen {user.Username}");
+        }
+        try
+        {
+          await user.ModifyAsync(x => x.Deaf = false);
+        }
+        catch (Exception e)
+        {
+          LogUtil.Write("Voice:UndeafenUser", e.Message);
+          await Context.User.SendMessageAsync(e.Message);
+          return;
+        }
+      }
     }
     #endregion
 
@@ -152,18 +269,25 @@ namespace HumanResources.AdminModule
         try
         {
           await TimeoutResource.Instance.SetTimeout(user, minutes);
-          var embed = new EmbedBuilder();
-          embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
-          embed.WithDescription("User set on timeout");
-          embed.AddField("Judge", Context.User.Username, true);
-          embed.AddField("Minutes", minutes, true);
-
-          await ReplyAsync("", false, embed.Build());
+          if (user.VoiceChannel != null)
+          {
+            var temp = await Context.Guild.CreateVoiceChannelAsync(LogUtil.ToUnixTime().ToString());
+            await user.ModifyAsync(x => x.Channel = temp);
+            await temp.DeleteAsync();
+          }
         }
         catch(Exception e)
         {
           LogUtil.Write("Timeout:TimeoutUser", e.Message);
+          return;
         }
+        var embed = new EmbedBuilder();
+        embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
+        embed.WithDescription("User set on timeout");
+        embed.AddField("Judge", Context.User.Username, true);
+        embed.AddField("Minutes", minutes, true);
+
+        await ReplyAsync("", false, embed.Build());
       }
 
       [Command("remove"), Summary("Removes timeout from specified user")]
@@ -173,11 +297,11 @@ namespace HumanResources.AdminModule
         try
         {
           await TimeoutResource.Instance.UnsetTimeout(user);
-          await Context.User.SendMessageAsync($"Couldn't remove {user.Username} from timeout");
         }
         catch (Exception e)
         {
           LogUtil.Write("Timeout:UntimeoutUser", e.Message);
+          await Context.User.SendMessageAsync($"Couldn't remove {user.Username} from timeout");
         }
       }
     }
