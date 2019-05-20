@@ -109,111 +109,115 @@ namespace HumanResources.AdminModule
         await ReplyAsync("", false, embed.Build());
       }
 
-      [Command("mute"), Summary("Mutes the specified user")]
+      [Group("mute")]
       [RequireBotPermission(GuildPermission.MuteMembers)]
       [RequireUserPermission(GuildPermission.MuteMembers)]
-      public async Task MuteUser([Summary("The user to mute")] IGuildUser user, [Summary("The reason for the mute")] [Remainder] string reason = "")
+      public class Mute : ModuleBase<SocketCommandContext>
       {
-        if (user.IsMuted == true || user.VoiceChannel == null)
+        [Command, Summary("Mutes the specified user")]
+        public async Task MuteUser([Summary("The user to mute")] IGuildUser user, [Summary("The reason for the mute")] [Remainder] string reason = "")
         {
-          await Context.User.SendMessageAsync($"Unable to mute {user.Username}");
-          return;
-        }
-        try
-        {
-          await user.ModifyAsync(x => x.Mute = true);
-        }
-        catch (Exception e)
-        {
-          LogUtil.Write("Voice:MuteUser", e.Message);
-          await Context.User.SendMessageAsync(e.Message);
-          return;
+          if (user.IsMuted == true || user.VoiceChannel == null)
+          {
+            await Context.User.SendMessageAsync($"Unable to mute {user.Username}");
+            return;
+          }
+          try
+          {
+            await user.ModifyAsync(x => x.Mute = true);
+          }
+          catch (Exception e)
+          {
+            LogUtil.Write("Voice:MuteUser", e.Message);
+            await Context.User.SendMessageAsync(e.Message);
+            return;
+          }
+
+          var embed = new EmbedBuilder();
+          embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
+          embed.WithDescription("User muted");
+          embed.AddField("Judge", Context.User.Username, true);
+          if (!string.IsNullOrEmpty(reason))
+          {
+            embed.AddField("Reason", reason, true);
+          }
+
+          await ReplyAsync("", false, embed.Build());
         }
 
-        var embed = new EmbedBuilder();
-        embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
-        embed.WithDescription("User muted");
-        embed.AddField("Judge", Context.User.Username, true);
-        if (!string.IsNullOrEmpty(reason))
+        [Command("remove"), Summary("Unmutes the specified user")]
+        public async Task UnmuteUser([Summary("The user to unmute")] IGuildUser user)
         {
-          embed.AddField("Reason", reason, true);
+          if (user.IsSelfMuted == true || user.IsMuted == false || user.VoiceChannel == null)
+          {
+            await Context.User.SendMessageAsync($"Unable to unmute {user.Username}");
+          }
+          try
+          {
+            await user.ModifyAsync(x => x.Mute = false);
+          }
+          catch (Exception e)
+          {
+            LogUtil.Write("Voice:UnmuteUser", e.Message);
+            await Context.User.SendMessageAsync(e.Message);
+            return;
+          }
         }
-
-        await ReplyAsync("", false, embed.Build());
       }
 
-      [Command("unmute"), Summary("Unmutes the specified user")]
-      [RequireBotPermission(GuildPermission.MuteMembers)]
-      [RequireUserPermission(GuildPermission.MuteMembers)]
-      public async Task UnmuteUser([Summary("The user to unmute")] IGuildUser user)
-      {
-        if (user.IsSelfMuted == true || user.IsMuted == false || user.VoiceChannel == null)
-        {
-          await Context.User.SendMessageAsync($"Unable to unmute {user.Username}");
-        }
-        try
-        {
-          await user.ModifyAsync(x => x.Mute = false);
-        }
-        catch (Exception e)
-        {
-          LogUtil.Write("Voice:UnmuteUser", e.Message);
-          await Context.User.SendMessageAsync(e.Message);
-          return;
-        }
-      }
-
-      [Command("deafen"), Summary("Deafens the specified user")]
+      [Group("deafen")]
       [RequireBotPermission(GuildPermission.DeafenMembers)]
       [RequireUserPermission(GuildPermission.DeafenMembers)]
-      public async Task DeafenUser([Summary("The user to deafen")] IGuildUser user, [Summary("The reason for the deafening")] [Remainder] string reason = "")
+      public class Deafen : ModuleBase<SocketCommandContext>
       {
-        if (user.IsDeafened == true || user.VoiceChannel == null)
+        [Command, Summary("Deafens the specified user")]
+        public async Task DeafenUser([Summary("The user to deafen")] IGuildUser user, [Summary("The reason for the deafening")] [Remainder] string reason = "")
         {
-          await Context.User.SendMessageAsync($"Unable to deafen {user.Username}");
-          return;
-        }
-        try
-        {
-          await user.ModifyAsync(x => x.Deaf = true);
-        }
-        catch (Exception e)
-        {
-          LogUtil.Write("Voice:DeafenUser", e.Message);
-          await Context.User.SendMessageAsync(e.Message);
-          return;
+          if (user.IsDeafened == true || user.VoiceChannel == null)
+          {
+            await Context.User.SendMessageAsync($"Unable to deafen {user.Username}");
+            return;
+          }
+          try
+          {
+            await user.ModifyAsync(x => x.Deaf = true);
+          }
+          catch (Exception e)
+          {
+            LogUtil.Write("Voice:DeafenUser", e.Message);
+            await Context.User.SendMessageAsync(e.Message);
+            return;
+          }
+
+          var embed = new EmbedBuilder();
+          embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
+          embed.WithDescription("User deafened");
+          embed.AddField("Judge", Context.User.Username, true);
+          if (!string.IsNullOrEmpty(reason))
+          {
+            embed.AddField("Reason", reason, true);
+          }
+
+          await ReplyAsync("", false, embed.Build());
         }
 
-        var embed = new EmbedBuilder();
-        embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
-        embed.WithDescription("User deafened");
-        embed.AddField("Judge", Context.User.Username, true);
-        if (!string.IsNullOrEmpty(reason))
+        [Command("remove"), Summary("Undeafens the specified user")]
+        public async Task UndeafenUser([Summary("The user to undeafen")] IGuildUser user)
         {
-          embed.AddField("Reason", reason, true);
-        }
-
-        await ReplyAsync("", false, embed.Build());
-      }
-
-      [Command("undeafen"), Summary("Undeafens the specified user")]
-      [RequireBotPermission(GuildPermission.MuteMembers)]
-      [RequireUserPermission(GuildPermission.MuteMembers)]
-      public async Task UndeafenUser([Summary("The user to undeafen")] IGuildUser user)
-      {
-        if (user.IsSelfDeafened == true || user.IsDeafened == false || user.VoiceChannel == null)
-        {
-          await Context.User.SendMessageAsync($"Unable to undeafen {user.Username}");
-        }
-        try
-        {
-          await user.ModifyAsync(x => x.Deaf = false);
-        }
-        catch (Exception e)
-        {
-          LogUtil.Write("Voice:UndeafenUser", e.Message);
-          await Context.User.SendMessageAsync(e.Message);
-          return;
+          if (user.IsSelfDeafened == true || user.IsDeafened == false || user.VoiceChannel == null)
+          {
+            await Context.User.SendMessageAsync($"Unable to undeafen {user.Username}");
+          }
+          try
+          {
+            await user.ModifyAsync(x => x.Deaf = false);
+          }
+          catch (Exception e)
+          {
+            LogUtil.Write("Voice:UndeafenUser", e.Message);
+            await Context.User.SendMessageAsync(e.Message);
+            return;
+          }
         }
       }
     }
@@ -316,6 +320,10 @@ namespace HumanResources.AdminModule
       [RequireBotPermission(GuildPermission.ManageNicknames)]
       public async Task MarkUser([Summary("The user to set a mark on")] IGuildUser user, [Summary("The reason for marking the user")] string reason = "")
       {
+        if (Config.Bot.Guilds[user.GuildId].Marklist)
+        {
+          BlacklistResource.Instance.Push(user.GuildId, user.Id);
+        }
         if (MarkResource.Instance.Push(user.GuildId, user.Id))
         {
           var mark = Config.Bot.Guilds[user.GuildId].Mark;
@@ -338,6 +346,10 @@ namespace HumanResources.AdminModule
       [RequireBotPermission(GuildPermission.ManageNicknames)]
       public async Task UnmarkUser(IGuildUser user)
       {
+        if (Config.Bot.Guilds[user.GuildId].Marklist)
+        {
+          BlacklistResource.Instance.Pop(user.GuildId, user.Id);
+        }
         if (MarkResource.Instance.Pop(user.GuildId, user.Id))
         {
           try

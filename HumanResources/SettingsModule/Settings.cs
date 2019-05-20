@@ -1,7 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using HumanResources.AdminModule;
 using HumanResources.Utilities;
 using System.Threading.Tasks;
 
@@ -21,6 +20,7 @@ namespace HumanResources.Settings
       embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl());
       embed.AddField("Prefix", $"**{guildCfg.Prefix}**", true);
       embed.AddField("Mark", $"**{guildCfg.Mark}**", true);
+      embed.AddField("Blacklist on mark?", "**" + (guildCfg.Marklist ? "Yes" : "No") + "**");
       embed.WithFooter(LogUtil.LogTime);
 
       await ReplyAsync("", false, embed.Build());
