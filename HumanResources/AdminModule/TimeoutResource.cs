@@ -44,7 +44,7 @@ namespace HumanResources.AdminModule
               var tick = this.MakeTimer(gid, uid, temp[gid][uid].Time);
               if (tick == null)
               {
-                this.UnknownUnset(gid, uid);
+                await this.UnknownUnset(gid, uid);
               }
               else
               {

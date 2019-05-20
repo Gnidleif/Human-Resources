@@ -17,6 +17,7 @@ namespace HumanResources
       {
         Directory.CreateDirectory(Global.ResourceFolder);
       }
+
       var temp = new BotConfig();
       if (File.Exists(Path) ? JsonUtil.TryRead(Path, out temp) : JsonUtil.TryWrite(Path, temp))
       {
@@ -38,6 +39,7 @@ namespace HumanResources
 
     public static bool Pop(ulong id) => Bot.Guilds.Remove(id);
   }
+
   public class BotConfig
   {
     public string Token { get; set; }
@@ -50,6 +52,18 @@ namespace HumanResources
     public char Prefix { get; set; } = '!';
     public char Mark { get; set; } = '⭐';
     public bool MarkList { get; set; } = false;
-    public uint WaitTimer { get; set; } = 10;
+    public WelcomeConfig Welcome { get; set; } = new WelcomeConfig();
+  }
+
+  public class WelcomeConfig
+  {
+    public bool Enabled { get; set; } = false;
+    public uint Time { get; set; } = 10;
+    public int Position { get; set; } = 0;
+    public string Message { get; set; }
+    public WelcomeConfig()
+    {
+      this.Message = $"Hello! You'll gain full privileges as soon as we're done calibrating.";
+    }
   }
 }

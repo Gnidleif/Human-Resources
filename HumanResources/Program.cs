@@ -28,6 +28,7 @@ namespace HumanResources
         LogLevel = Discord.LogSeverity.Verbose,
       });
 
+      Global.Client.UserJoined += Client_UserJoined;
       Global.Client.Log += Client_Log;
       Global.Client.LeftGuild += Client_LeftGuild;
       Global.Client.JoinedGuild += Client_JoinedGuild;
@@ -65,6 +66,32 @@ namespace HumanResources
       await Task.Delay(-1);
     }
 
+    private async Task Client_UserJoined(SocketGuildUser arg)
+    {
+      var wait = Config.Bot.Guilds[arg.Guild.Id].Welcome;
+      if (wait.Enabled)
+      {
+        try
+        {
+          var firstRole = arg.Guild.Roles.First(x => x.Position == wait.Position);
+          await arg.AddRoleAsync(firstRole);
+        }
+        catch (Exception e)
+        {
+          LogUtil.Write("Client_UserJoined", e.Message);
+          return;
+        }
+        if (wait.Time > 0)
+        {
+          await TimeoutResource.Instance.SetTimeout(arg, wait.Time);
+          if (!string.IsNullOrEmpty(wait.Message))
+          {
+            await arg.SendMessageAsync(wait.Message);
+          }
+        }
+      }
+    }
+
     private async Task Client_Log(Discord.LogMessage arg)
     {
       LogUtil.Write(arg.Source, arg.Message);
@@ -81,11 +108,7 @@ namespace HumanResources
 
     private async Task Client_JoinedGuild(SocketGuild arg)
     {
-      if (Config.Push(arg.Id))
-      {
-        LogUtil.Write("Client_JoinedGuild", $"Successfully joined {arg.Id}");
-      }
-
+      _ = Config.Push(arg.Id);
       await Task.CompletedTask;
     }
 
