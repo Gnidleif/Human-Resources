@@ -37,16 +37,6 @@ namespace HumanResources
     }
 
     public static bool Pop(ulong id) => Bot.Guilds.Remove(id);
-
-    public static bool Update(ulong id, GuildConfig newCfg)
-    {
-      if (Bot.Guilds.ContainsKey(id))
-      {
-        Bot.Guilds[id] = newCfg;
-        return true;
-      }
-      return false;
-    }
   }
   public class BotConfig
   {
@@ -59,6 +49,7 @@ namespace HumanResources
   {
     public char Prefix { get; set; } = '!';
     public char Mark { get; set; } = '⭐';
-    public bool Marklist { get; set; } = false;
+    public bool MarkList { get; set; } = false;
+    public uint WaitTimer { get; set; } = 10;
   }
 }

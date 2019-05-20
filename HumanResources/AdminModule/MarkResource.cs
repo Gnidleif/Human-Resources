@@ -89,7 +89,9 @@ namespace HumanResources.AdminModule
       return false;
     }
 
-    public bool Contains(ulong gid, ulong uid) => this.List.ContainsKey(gid) && this.List[gid].Contains(uid);
+    public bool Contains(ulong gid) => this.List.ContainsKey(gid);
+
+    public bool Contains(ulong gid, ulong uid) => this.Contains(gid) && this.List[gid].Contains(uid);
 
     public bool Remove(ulong gid) => this.List.Remove(gid);
 
@@ -107,6 +109,21 @@ namespace HumanResources.AdminModule
         {
           LogUtil.Write("MarkHandler:CheckSet", e.Message);
           _ = this.Pop(user.GuildId, user.Id);
+        }
+      }
+    }
+
+    public async Task CheckSetGuild(IGuild guild)
+    {
+      if (this.Contains(guild.Id))
+      {
+        var g = guild as SocketGuild;
+        foreach(var user in g.Users)
+        {
+          if (this.Contains(g.Id, user.Id))
+          {
+            await this.CheckSet(user, Config.Bot.Guilds[g.Id].Mark);
+          }
         }
       }
     }
