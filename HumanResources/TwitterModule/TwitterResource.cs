@@ -59,14 +59,9 @@ namespace HumanResources.TwitterModule
         {
           foreach (var cid in temp.Follows[gid].Keys)
           {
-            var c = Global.Client.GetGuild(gid).GetChannel(cid);
-            if (c != null && this.Push(gid, cid))
+            if (this.Push(gid, cid))
             {
-              this.Config.Follows[gid][cid] = new ChannelUsers
-              {
-                Channel = c as IMessageChannel,
-                Users = temp.Follows[gid][cid].Users,
-              };
+              this.Config.Follows[gid][cid].Users = temp.Follows[gid][cid].Users;
             }
           }
         }
@@ -109,7 +104,22 @@ namespace HumanResources.TwitterModule
       }
       if (!this.Config.Follows[gid].ContainsKey(cid))
       {
-        this.Config.Follows[gid].Add(cid, null);
+        var g = Global.Client.GetGuild(gid);
+        if (g == null)
+        {
+          _ = this.Pop(gid);
+          return false;
+        }
+        var c = g.GetChannel(cid);
+        if (c == null)
+        {
+          _ = this.Pop(gid, cid);
+          return false;
+        }
+        this.Config.Follows[gid].Add(cid, new ChannelUsers
+        {
+          Channel = c as IMessageChannel,
+        });
         return true;
       }
       return false;

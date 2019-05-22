@@ -24,19 +24,24 @@ namespace HumanResources.TwitterModule
     public class Stalk : ModuleBase<SocketCommandContext>
     {
       [Command, Summary("Stalk a twitter user specified by handle, output in given channel")]
-      public async Task StalkUser([Summary("The relevant handle")] string handle, IMessageChannel channel)
+      public async Task StalkUser([Summary("The relevant handle")] string user, IMessageChannel channel)
       {
         await Task.CompletedTask;
       }
 
       [Command, Summary("Stalk a twitter user specified by ID, output in given channel")]
-      public async Task StalkUser([Summary("The relevant ID")] ulong id, IMessageChannel channel)
+      public async Task StalkUser([Summary("The relevant ID")] ulong user, IMessageChannel channel)
       {
+        if (TwitterResource.Instance.Push(Context.Guild.Id, channel.Id, user))
+        {
+          await ReplyAsync(":white_check_mark: User added");
+        }
+
         await Task.CompletedTask;
       }
 
       [Command("remove"), Summary("Remove output from twitter user given a handle")]
-      public async Task UnstalkUser([Summary("The relevant handle")] string handle, IMessageChannel channel)
+      public async Task UnstalkUser([Summary("The relevant handle")] string user, IMessageChannel channel)
       {
         await Task.CompletedTask;
       }
