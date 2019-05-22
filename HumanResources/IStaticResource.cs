@@ -10,6 +10,6 @@ namespace HumanResources
     bool Push(ulong gid, ulong uid);
     bool Pop(ulong gid, ulong uid);
     bool Contains(ulong gid, ulong uid);
-    bool Remove(ulong gid);
+    bool Pop(ulong gid);
   }
 }

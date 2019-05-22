@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using HumanResources.AdminModule;
 using Discord;
+using HumanResources.TwitterModule;
 
 namespace HumanResources
 {
@@ -58,6 +59,7 @@ namespace HumanResources
         MarkResource.Instance,
         BlacklistResource.Instance,
         TimeoutResource.Instance,
+        TwitterResource.Instance,
       };
       AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
 
@@ -102,7 +104,7 @@ namespace HumanResources
     private async Task Client_LeftGuild(SocketGuild arg)
     {
       _ = Config.Pop(arg.Id);
-      this.Resources.ForEach(x => x.Remove(arg.Id));
+      this.Resources.ForEach(x => x.Pop(arg.Id));
 
       await Task.CompletedTask;
     }

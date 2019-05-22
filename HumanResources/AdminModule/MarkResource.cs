@@ -93,7 +93,7 @@ namespace HumanResources.AdminModule
 
     public bool Contains(ulong gid, ulong uid) => this.Contains(gid) && this.List[gid].Contains(uid);
 
-    public bool Remove(ulong gid) => this.List.Remove(gid);
+    public bool Pop(ulong gid) => this.List.Remove(gid);
 
     public async Task CheckSet(IGuildUser user, char mark)
     {
