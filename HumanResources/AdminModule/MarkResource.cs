@@ -135,9 +135,9 @@ namespace HumanResources.AdminModule
         return;
       }
       var user = arg2 as IGuildUser;
-      if (MarkResource.Instance.Contains(user.GuildId, user.Id))
+      if (this.Contains(user.GuildId, user.Id))
       {
-        await MarkResource.Instance.CheckSet(user, Config.Bot.Guilds[user.GuildId].Mark);
+        await this.CheckSet(user, Config.Bot.Guilds[user.GuildId].Mark);
       }
     }
   }

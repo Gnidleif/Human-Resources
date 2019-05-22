@@ -97,7 +97,7 @@ namespace HumanResources.Settings
       }
 
       [Command("message"), Summary("Set the welcome message")]
-      public async Task SetMessage([Summary("The new welcome message, leave empty to remove functionality")] [Remainder] string msg = "")
+      public async Task SetMessage([Summary("The new welcome message, leave empty to disable functionality")] [Remainder] string msg = "")
       {
         Config.Bot.Guilds[Context.Guild.Id].Welcome.Message = msg;
         if (!string.IsNullOrEmpty(msg))

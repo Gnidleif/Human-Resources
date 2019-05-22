@@ -25,7 +25,7 @@ namespace HumanResources
 
       Global.Client = new DiscordSocketClient(new DiscordSocketConfig
       {
-        LogLevel = Discord.LogSeverity.Verbose,
+        LogLevel = LogSeverity.Verbose,
       });
 
       Global.Client.UserJoined += Client_UserJoined;
@@ -37,7 +37,7 @@ namespace HumanResources
 
       try
       {
-        await Global.Client.LoginAsync(Discord.TokenType.Bot, Config.Bot.Token);
+        await Global.Client.LoginAsync(TokenType.Bot, Config.Bot.Token);
         await Global.Client.StartAsync();
       }
       catch (Discord.Net.HttpException e)
@@ -49,6 +49,7 @@ namespace HumanResources
           Guilds = Config.Bot.Guilds,
         };
         LogUtil.Write("MainAsync", e.Message);
+        _ = Config.Save();
         return;
       }
 
@@ -92,7 +93,7 @@ namespace HumanResources
       }
     }
 
-    private async Task Client_Log(Discord.LogMessage arg)
+    private async Task Client_Log(LogMessage arg)
     {
       LogUtil.Write(arg.Source, arg.Message);
       await Task.CompletedTask;
