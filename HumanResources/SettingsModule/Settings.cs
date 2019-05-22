@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 namespace HumanResources.Settings
 {
   [Group("settings")]
+  [RequireContext(ContextType.Guild)]
   [Remarks("Most of these functions are only accessible by guild administrators")]
   public class Settings : ModuleBase<SocketCommandContext>
   {

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace HumanResources.AdminModule
 {
+  [RequireContext(ContextType.Guild)]
   public class Administration : ModuleBase<SocketCommandContext>
   {
     #region General
