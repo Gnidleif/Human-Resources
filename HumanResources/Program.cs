@@ -69,6 +69,12 @@ namespace HumanResources
       await Task.Delay(-1);
     }
 
+    private async Task Client_LatencyUpdated(int arg1, int arg2)
+    {
+      this.Resources.ForEach(x => x.Save());
+      await Task.CompletedTask;
+    }
+
     private async Task Client_UserJoined(SocketGuildUser arg)
     {
       var wait = Config.Bot.Guilds[arg.Guild.Id].Welcome;
@@ -126,6 +132,7 @@ namespace HumanResources
         _ = r.Save();
       }
 
+      Global.Client.LatencyUpdated += Client_LatencyUpdated;
       await Task.CompletedTask;
     }
 
