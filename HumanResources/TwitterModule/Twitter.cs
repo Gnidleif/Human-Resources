@@ -18,10 +18,12 @@ namespace HumanResources.TwitterModule
       {
         var embed = new EmbedBuilder();
         embed.WithAuthor($"{user.Name} (@{user.ScreenNameResponse})", user.ProfileImageUrl, $"https://twitter.com/{user.ScreenNameResponse}");
-        var rgb = uint.Parse(user.ProfileLinkColor.Replace("#", ""), System.Globalization.NumberStyles.HexNumber);
         embed.WithDescription(user.Description);
-        embed.WithColor(new Color(rgb));
-        embed.WithFooter("ID: " + user.UserIDResponse, TwitterResource.Instance.Icon);
+        if (uint.TryParse(user.ProfileLinkColor.Replace("#", ""), System.Globalization.NumberStyles.HexNumber, null, out uint rgb))
+        {
+          embed.WithColor(new Color(rgb));
+        }
+        embed.WithFooter($"ID: {user.UserIDResponse}", TwitterResource.Instance.Icon);
 
         await ReplyAsync("", false, embed.Build());
       }
@@ -55,12 +57,7 @@ namespace HumanResources.TwitterModule
           var l = await TwitterResource.Instance.GetUsersByChannelIdAsync(c.Id);
           if (l.Any())
           {
-            var names = new List<string>();
-            foreach(var u in l)
-            {
-              names.Add($"[{u.ScreenNameResponse}](https://www.twitter.com/{u.ScreenNameResponse})");
-            }
-            embed.AddField(c.Name, string.Join(", ", names));
+            embed.AddField($"#{c.Name}", string.Join(", ", l.Select(x => $"[{x.ScreenNameResponse}](https://www.twitter.com/{x.ScreenNameResponse})").ToList()));
             any = true;
           }
         }

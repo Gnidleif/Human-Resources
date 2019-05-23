@@ -92,7 +92,7 @@ namespace HumanResources
         }
         if (wait.Time > 0)
         {
-          await TimeoutResource.Instance.SetTimeout(arg, wait.Time);
+          _ = TimeoutResource.Instance.SetTimeout(arg, wait.Time);
           if (!string.IsNullOrEmpty(wait.Message))
           {
             await arg.SendMessageAsync(wait.Message);

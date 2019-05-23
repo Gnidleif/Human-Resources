@@ -101,15 +101,7 @@ namespace HumanResources.TwitterModule
     public async Task<User> GetUserAsync(string identifier)
     {
       var query = this.Ctx.User.Where(t => t.Type == UserType.Show);
-      ulong id = 0;
-      if (ulong.TryParse(identifier, out id))
-      {
-        query = query.Where(t => t.UserID == id);
-      }
-      else
-      {
-        query = query.Where(t => t.ScreenName == identifier);
-      }
+      query = ulong.TryParse(identifier, out ulong id) ? query.Where(t => t.UserID == id) : query.Where(t => t.ScreenName == identifier);
       return await query.SingleOrDefaultAsync();
     }
 
@@ -119,14 +111,10 @@ namespace HumanResources.TwitterModule
       var ids = this.Info.UserChannels.Where(x => x.Value.Contains(cid)).Select(x => x.Key).ToList();
       if (ids.Any())
       {
-        foreach(var id in ids)
-        {
-          var user = await this.GetUserAsync(id.ToString());
-          if (user != null)
-          {
-            list.Add(user);
-          }
-        }
+        list = await this.Ctx.User
+          .Where(t => t.Type == UserType.Lookup)
+          .Where(t => t.UserIdList == string.Join(",", ids))
+          .ToListAsync();
       }
       return list;
     }
