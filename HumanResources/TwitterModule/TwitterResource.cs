@@ -17,6 +17,7 @@ namespace HumanResources.TwitterModule
     private TwitterContext Ctx { get; set; }
 
     public static TwitterResource Instance { get { return lazy.Value; } }
+    public readonly string Icon = "https://images-ext-1.discordapp.net/external/bXJWV2Y_F3XSra_kEqIYXAAsI3m1meckfLhYuWzxIfI/https/abs.twimg.com/icons/apple-touch-icon-192x192.png";
 
     private TwitterResource()
     {
@@ -103,21 +104,31 @@ namespace HumanResources.TwitterModule
       ulong id = 0;
       if (ulong.TryParse(identifier, out id))
       {
-        query = query.Where(t => t.UserID == id || t.Name == identifier || t.ScreenName == identifier);
+        query = query.Where(t => t.UserID == id);
       }
       else
       {
-        query = query.Where(t => t.Name == identifier || t.ScreenName == identifier);
+        query = query.Where(t => t.ScreenName == identifier);
       }
       return await query.SingleOrDefaultAsync();
     }
 
-    public List<User> GetUsersByChannelId(ulong cid)
+    public async Task<List<User>> GetUsersByChannelIdAsync(ulong cid)
     {
+      var list = new List<User>();
       var ids = this.Info.UserChannels.Where(x => x.Value.Contains(cid)).Select(x => x.Key).ToList();
-      var res = new List<User>();
-      ids.ForEach(async x => res.Add(await this.GetUserAsync(x.ToString())));
-      return res;
+      if (ids.Any())
+      {
+        foreach(var id in ids)
+        {
+          var user = await this.GetUserAsync(id.ToString());
+          if (user != null)
+          {
+            list.Add(user);
+          }
+        }
+      }
+      return list;
     }
   }
 

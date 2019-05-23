@@ -1,5 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
+using HumanResources.Utilities;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -9,7 +11,7 @@ namespace HumanResources.TwitterModule
   public class Twitter : ModuleBase<SocketCommandContext>
   {
     [Command, Summary("Retrieves a Twitter user specified by handle/id")]
-    public async Task GetUser([Remainder] string identifier)
+    public async Task GetUser(string identifier)
     {
       var user = await TwitterResource.Instance.GetUserAsync(identifier);
       if (user != null)
@@ -19,7 +21,7 @@ namespace HumanResources.TwitterModule
         var rgb = uint.Parse(user.ProfileLinkColor.Replace("#", ""), System.Globalization.NumberStyles.HexNumber);
         embed.WithDescription(user.Description);
         embed.WithColor(new Color(rgb));
-        embed.WithFooter("ID: " + user.UserIDResponse, "https://images-ext-1.discordapp.net/external/bXJWV2Y_F3XSra_kEqIYXAAsI3m1meckfLhYuWzxIfI/https/abs.twimg.com/icons/apple-touch-icon-192x192.png");
+        embed.WithFooter("ID: " + user.UserIDResponse, TwitterResource.Instance.Icon);
 
         await ReplyAsync("", false, embed.Build());
       }
@@ -30,7 +32,7 @@ namespace HumanResources.TwitterModule
     public class Stalk : ModuleBase<SocketCommandContext>
     {
       [Command, Summary("Start outputting any tweets a specified user does in the given channel")]
-      public async Task StalkUser(IMessageChannel ch, [Remainder] string identifier)
+      public async Task StalkUser(string identifier, IMessageChannel ch)
       {
         var user = await TwitterResource.Instance.GetUserAsync(identifier);
         if (user != null)
@@ -46,16 +48,28 @@ namespace HumanResources.TwitterModule
       [Command("list"), Summary("Return list of stalked users")]
       public async Task StalkList()
       {
+        var any = false;
         var embed = new EmbedBuilder();
         foreach(var c in Context.Guild.Channels)
         {
-          var l = TwitterResource.Instance.GetUsersByChannelId(c.Id);
+          var l = await TwitterResource.Instance.GetUsersByChannelIdAsync(c.Id);
           if (l.Any())
           {
-            embed.AddField(c.Name, string.Join(", ", l.Select(x => x.ScreenNameResponse)));
+            var names = new List<string>();
+            foreach(var u in l)
+            {
+              names.Add($"[{u.ScreenNameResponse}](https://www.twitter.com/{u.ScreenNameResponse})");
+            }
+            embed.AddField(c.Name, string.Join(", ", names));
+            any = true;
           }
         }
-        await ReplyAsync("", false, embed.Build());
+        if (any)
+        {
+          embed.WithColor(56, 161, 243);
+          embed.WithFooter(LogUtil.LogTime, TwitterResource.Instance.Icon);
+          await ReplyAsync("", false, embed.Build());
+        }
       }
     }
   }
