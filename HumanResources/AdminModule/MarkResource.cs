@@ -128,7 +128,7 @@ namespace HumanResources.AdminModule
       }
     }
 
-    public List<ulong> GetMarkedByGuild(ulong gid) => this.List.Where(x => x.Key == gid).Select(x => x.Value).FirstOrDefault().ToList();
+    public List<ulong> GetUsersByGuild(ulong gid) => !this.List.Any() ? new List<ulong>() : this.List.Where(x => x.Key == gid).Select(x => x.Value).FirstOrDefault()?.ToList();
 
     private async Task Client_GuildMemberUpdated(SocketGuildUser arg1, SocketGuildUser arg2)
     {

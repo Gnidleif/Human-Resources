@@ -59,7 +59,7 @@ namespace HumanResources
   {
     public bool Enabled { get; set; } = false;
     public uint Time { get; set; } = 10;
-    public int Rank { get; set; } = 0;
+    public int Rank { get; set; } = 1;
     public string Message { get; set; }
     public WelcomeConfig()
     {

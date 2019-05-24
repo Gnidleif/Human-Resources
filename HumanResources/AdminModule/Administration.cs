@@ -265,7 +265,7 @@ namespace HumanResources.AdminModule
     {
       [Command, Summary("Sets the specified user in timeout")]
       [RequireBotPermission(GuildPermission.ManageRoles)]
-      public async Task TimeoutUser([Summary("The user to set on timeout")] IGuildUser user, [Summary("Minutes the timeout will last, 0 gives a random number between 10 and 5000")] uint minutes = 10)
+      public async Task TimeoutUser([Summary("The user to set on timeout")] IGuildUser user, [Summary("Minutes the timeout will last, 0 gives a random number between 10 and 5000")] uint minutes = 10, [Remainder] string reason = "")
       {
         if (minutes == 0)
         {
@@ -291,6 +291,10 @@ namespace HumanResources.AdminModule
         embed.WithDescription("User set on timeout");
         embed.AddField("Judge", Context.User.Username, true);
         embed.AddField("Minutes", minutes, true);
+        if (!string.IsNullOrEmpty(reason))
+        {
+          embed.AddField("Reason", reason, true);
+        }
 
         await ReplyAsync("", false, embed.Build());
       }

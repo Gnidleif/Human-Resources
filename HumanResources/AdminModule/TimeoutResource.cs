@@ -45,6 +45,7 @@ namespace HumanResources.AdminModule
               if (tick == null)
               {
                 await this.UnknownUnset(gid, uid);
+                _ = this.Pop(gid, uid);
               }
               else
               {
@@ -133,20 +134,23 @@ namespace HumanResources.AdminModule
       return tick;
     }
 
-    public async Task SetTimeout(IGuildUser user, uint minutes)
+    public async Task SetTimeout(IGuildUser user, uint minutes, List<ulong> roles = null)
     {
       var time = DateTime.Now.AddMinutes(minutes);
-      var roleIds = user.RoleIds.ToList();
+      if (roles == null)
+      {
+        roles = user.RoleIds.ToList();
+      }
       var gid = user.GuildId;
       var uid = user.Id;
       if (!this.Push(gid, uid))
       {
-        roleIds.AddRange(this.List[gid][uid].RoleIds);
-        roleIds = roleIds.Distinct().ToList();
+        roles.AddRange(this.List[gid][uid].RoleIds);
+        roles = roles.Distinct().ToList();
       }
       this.List[gid][uid] = new TimeoutMember
       {
-        RoleIds = roleIds,
+        RoleIds = roles,
         Time = time,
         Tick = this.MakeTimer(gid, uid, time),
       };
@@ -158,23 +162,22 @@ namespace HumanResources.AdminModule
         }
         catch (Exception e)
         {
-          throw e;
+          LogUtil.Write("TimeoutResource:SetTimeout", e.Message);
         }
         return;
       }
 
       try
       {
-        var roles = roleIds
+        var roleIds = roles
             .Select(x => user.Guild.GetRole(x))
             .Where(x => !x.IsManaged && x != user.Guild.EveryoneRole)
             .ToList();
-        await user.RemoveRolesAsync(roles);
+        await user.RemoveRolesAsync(roleIds);
       }
       catch (Exception e)
       {
         LogUtil.Write("TimeoutResource:SetTimeout", e.Message);
-        throw e;
       }
     }
 
@@ -195,7 +198,6 @@ namespace HumanResources.AdminModule
       catch (Exception e)
       {
         LogUtil.Write("TimeoutResource:UnsetTimeout", e.Message);
-        throw e;
       }
     }
   }

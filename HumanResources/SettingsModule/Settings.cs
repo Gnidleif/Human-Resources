@@ -52,17 +52,10 @@ namespace HumanResources.Settings
     {
       Config.Bot.Guilds[Context.Guild.Id].MarkList = state;
       var gid = Context.Guild.Id;
-      var list = MarkResource.Instance.GetMarkedByGuild(gid);
+      var list = MarkResource.Instance.GetUsersByGuild(gid);
       foreach(var uid in list)
       {
-        if (state == true)
-        {
-          BlacklistResource.Instance.Push(gid, uid);
-        }
-        else
-        {
-          BlacklistResource.Instance.Pop(gid, uid);
-        }
+        _ = state == true ? BlacklistResource.Instance.Push(gid, uid) : BlacklistResource.Instance.Pop(gid, uid);
       }
       await ReplyAsync($":white_check_mark: Successfully set blacklist on mark to **{state}**");
     }
@@ -106,8 +99,15 @@ namespace HumanResources.Settings
       [RequireUserPermission(GuildPermission.Administrator)]
       public async Task SetRole([Summary("The new first role")] IRole role)
       {
-        Config.Bot.Guilds[Context.Guild.Id].Welcome.Rank = role.Position;
-        await ReplyAsync($":white_check_mark: Successfully set first role to **{role.Name}**");
+        if (role.IsManaged || role == Context.Guild.EveryoneRole)
+        {
+          await ReplyAsync($":negative_squared_cross_mark: **{role.Name}** is an invalid starting role");
+        }
+        else
+        {
+          Config.Bot.Guilds[Context.Guild.Id].Welcome.Rank = role.Position;
+          await ReplyAsync($":white_check_mark: Successfully set first role to **{role.Name}**");
+        }
       }
 
       [Command("message"), Alias("m"), Summary("Set the welcome message")]

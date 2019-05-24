@@ -72,7 +72,7 @@ namespace HumanResources
     private async Task Client_LatencyUpdated(int arg1, int arg2)
     {
       _ = Config.Save();
-      this.Resources.ForEach(x => x.Save());
+      this.Resources.ForEach(x => x.Close());
       await Task.CompletedTask;
     }
 
@@ -81,22 +81,24 @@ namespace HumanResources
       var wait = Config.Bot.Guilds[arg.Guild.Id].Welcome;
       if (wait.Enabled)
       {
-        try
-        {
-          var firstRole = arg.Guild.Roles.First(x => x.Position == wait.Rank);
-          await arg.AddRoleAsync(firstRole);
-        }
-        catch (Exception e)
-        {
-          LogUtil.Write("Client_UserJoined", e.Message);
-          return;
-        }
+        var firstRole = arg.Guild.Roles.First(x => x.Position == wait.Rank);
         if (wait.Time > 0)
         {
-          _ = TimeoutResource.Instance.SetTimeout(arg, wait.Time);
+          await TimeoutResource.Instance.SetTimeout(arg, wait.Time, new List<ulong> { firstRole.Id });
           if (!string.IsNullOrEmpty(wait.Message))
           {
             await arg.SendMessageAsync(wait.Message);
+          }
+        }
+        else
+        {
+          try
+          {
+            await arg.AddRoleAsync(firstRole);
+          }
+          catch (Exception e)
+          {
+            LogUtil.Write("Client_UserJoined", e.Message);
           }
         }
       }
