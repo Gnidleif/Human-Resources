@@ -2,6 +2,17 @@
 
 General purpose Discord bot written in C#
 
+## Default settings
+
+* Prefix - !
+* Mark - ⭐
+* Marklist - false
+* Welcome
+  * Enabled - false
+  * Time - 10
+  * Rank - @everyone
+  * Message - Welcome! You'll gain full privileges soon.
+
 ## Features
 
 ### Settings - Get and set server specific settings
@@ -51,14 +62,3 @@ General purpose Discord bot written in C#
 * bool - Boolean expression (true/false)
 * uint - Number between 0 and 4294967295
 * string - String of characters
-
-## Default settings
-
-* Prefix - !
-* Mark - ⭐
-* Marklist - false
-* Welcome
-  * Enabled - false
-  * Time - 10
-  * Rank - @everyone
-  * Message - Welcome! You'll gain full privileges soon.
