@@ -52,11 +52,10 @@ namespace HumanResources.Settings
     {
       Config.Bot.Guilds[Context.Guild.Id].MarkList = state;
       var gid = Context.Guild.Id;
-      var list = MarkResource.Instance.GetUsersByGuild(gid);
-      foreach(var uid in list)
+      MarkResource.Instance.GetUsersByGuild(gid).ForEach(uid => 
       {
         _ = state == true ? BlacklistResource.Instance.Push(gid, uid) : BlacklistResource.Instance.Pop(gid, uid);
-      }
+      });
       await ReplyAsync($":white_check_mark: Successfully set blacklist on mark to **{state}**");
     }
 
