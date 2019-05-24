@@ -2,7 +2,7 @@
 
 General purpose Discord bot written in C#
 
-## Default settings
+## Default guild settings
 
 * Prefix - !
 * Mark - ⭐
@@ -36,7 +36,7 @@ General purpose Discord bot written in C#
 * **v**oice **m**ute remove <string/uint> - Removes mute from user (**mute**)
 * **v**oice **d**eafen <string/uint> ...reason - Deafen user (**deafen**)
 * **v**oice **d**eafen **r**emove <string/uint> - Removes deafen from user (**deafen**)
-* **bl**acklist <string/uint> ...reason - Blacklist user (**admin**)
+* **bl**acklist <string/uint> ...reason - Disable bot usage of user (**admin**)
 * **bl**acklist **r**emove <string/uint> - Removes user from blacklist (**admin**)
 * **t**imeout <string/uint> uint=10 - Set user on timeout (**admin**)
 * **t**imeout **r**emove <string/uint> - Removes user from timeout (**admin**)
