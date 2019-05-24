@@ -17,35 +17,35 @@ General purpose Discord bot written in C#
 
 ### Settings - Get and set server specific settings
 
-* settings - Returns the bot settings for the guild
-* prefix <char> - Set command prefix for the guild (**admin**)
-* mark <char> - Set mark for the guild (**admin**)
-* marklist <bool> - Set if marked members are also blacklisted (**admin**)
-* settings welcome - Returns all the welcome settings for the guild
-* settings welcome enable <bool> - Enable or disable guild welcome functionality (**admin**)
-* settings welcome time <uint> - Set the guild welcome time (**admin**)
-* settings welcome role <string/uint> - Set the first role of new users (**admin**)
-* settings welcome message <...string> - Set the new guild welcome message (**admin**)
+* **s**etting**s** - Returns the bot settings for the guild
+* **p**refi**x** <char> - Set command prefix for the guild (**admin**)
+* **m**ar**k** <char> - Set mark for the guild (**admin**)
+* **m**ark**l**ist <bool> - Set if marked members are also blacklisted (**admin**)
+* **s**ettings **w**elcome - Returns all the welcome settings for the guild
+* **s**ettings **w**elcome **e**nable <bool> - Enable or disable guild welcome functionality (**admin**)
+* **s**ettings **w**elcome **t**ime <uint> - Set the guild welcome time (**admin**)
+* **s**ettings **w**elcome **r**ole <string/uint> - Set the first role of new users (**admin**)
+* **s**ettings **w**elcome **m**essage <...string> - Set the new guild welcome message (**admin**)
 
 ### Administration - Standard administrative guild functions
 
-* kick <string/uint> ...reason - Kicks user (**kick**)
-* ban <string/uint> ...reason - Bans user (**ban**)
-* voice kick <string/uint> ...reason - Voice kick user (**kick**)
-* voice mute <string/uint> ...reason - Mute user (**mute**)
-* voice mute remove <string/uint> - Removes mute from user (**mute**)
-* voice deafen <string/uint> ...reason - Deafen user (**deafen**)
-* voice deafen remove <string/uint> - Removes deafen from user (**deafen**)
-* blacklist <string/uint> ...reason - Blacklist user (**admin**)
-* blacklist remove <string/uint> - Removes user from blacklist (**admin**)
-* timeout <string/uint> uint=10 - Set user on timeout (**admin**)
-* timeout remove <string/uint> - Removes user from timeout (**admin**)
-* mark <string/uint> ...reason - Set guild mark on user (**admin**)
-* mark remove <string/uint> - Remove guild mark from user (**admin**)
+* **k**ick <string/uint> ...reason - Kicks user (**kick**)
+* **b**an <string/uint> ...reason - Bans user (**ban**)
+* **v**oice **k**ick <string/uint> ...reason - Voice kick user (**kick**)
+* **v**oice **m**ute <string/uint> ...reason - Mute user (**mute**)
+* **v**oice **m**ute remove <string/uint> - Removes mute from user (**mute**)
+* **v**oice **d**eafen <string/uint> ...reason - Deafen user (**deafen**)
+* **v**oice **d**eafen **r**emove <string/uint> - Removes deafen from user (**deafen**)
+* **bl**acklist <string/uint> ...reason - Blacklist user (**admin**)
+* **bl**acklist **r**emove <string/uint> - Removes user from blacklist (**admin**)
+* **t**imeout <string/uint> uint=10 - Set user on timeout (**admin**)
+* **t**imeout **r**emove <string/uint> - Removes user from timeout (**admin**)
+* **m**ark <string/uint> ...reason - Set guild mark on user (**admin**)
+* **m**ark **r**emove <string/uint> - Remove guild mark from user (**admin**)
 
 ### Twitter - Various Twitter related functions
 
-* twitter <string/uint> - Returns information on Twitter user
+* **tw**itter <string/uint> - Returns information on Twitter user
 
 ## Key
 
