@@ -18,14 +18,14 @@ General purpose Discord bot written in C#
 ### Settings - Get and set guild specific settings
 
 * **s**etting**s** - Returns the bot settings for the guild
-* **p**refi**x** <char> - Set command prefix for the guild (**admin**)
-* **m**ar**k** <char> - Set mark for the guild (**admin**)
-* **m**ark**l**ist <bool> - Set if marked members are also blacklisted (**admin**)
-* **s**ettings **w**elcome - Returns all the welcome settings for the guild
-* **s**ettings **w**elcome **e**nable <bool> - Enable or disable guild welcome functionality (**admin**)
-* **s**ettings **w**elcome **t**ime <uint> - Set the guild welcome time (**admin**)
-* **s**ettings **w**elcome **r**ole <string/uint> - Set the first role of new users (**admin**)
-* **s**ettings **w**elcome **m**essage <...string> - Set the new guild welcome message (**admin**)
+* **s**etting**s** **p**refi**x** <char> - Set command prefix for the guild (**admin**)
+* **s**etting**s** **m**ar**k** <char> - Set mark for the guild (**admin**)
+* **s**etting**s** **m**ark**l**ist <bool> - Set if marked members are also blacklisted (**admin**)
+* **s**etting**s** **w**elcome - Returns all the welcome settings for the guild
+* **s**etting**s** **w**elcome **e**nable <bool> - Enable or disable guild welcome functionality (**admin**)
+* **s**etting**s** **w**elcome **t**ime <uint> - Set the guild welcome time (**admin**)
+* **s**etting**s** **w**elcome **r**ole <string/uint> - Set the first role of new users (**admin**)
+* **s**etting**s** **w**elcome **m**essage <...string> - Set the new guild welcome message (**admin**)
 
 ### Administration - Standard administrative guild functions
 
@@ -40,8 +40,8 @@ General purpose Discord bot written in C#
 * **bl**acklist **r**emove <string/uint> - Removes user from blacklist (**admin**)
 * **t**imeout <string/uint> uint=10 - Set user on timeout (**admin**)
 * **t**imeout **r**emove <string/uint> - Removes user from timeout (**admin**)
-* **m**ark <string/uint> ...reason - Set guild mark on user (**admin**)
-* **m**ark **r**emove <string/uint> - Remove guild mark from user (**admin**)
+* **m**ar**k** <string/uint> ...reason - Set guild mark on user (**admin**)
+* **m**ar**k** **r**emove <string/uint> - Remove guild mark from user (**admin**)
 
 ### Twitter - Various Twitter related functions
 
