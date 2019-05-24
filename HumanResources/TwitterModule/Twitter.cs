@@ -7,53 +7,57 @@ using System.Threading.Tasks;
 
 namespace HumanResources.TwitterModule
 {
-  [Group("twitter")]
+  [Group("twitter"), Alias("tw")]
   public class Twitter : ModuleBase<SocketCommandContext>
   {
-    [Command, Alias("tw"), Summary("Retrieves a Twitter user specified by handle/id")]
-    public async Task GetUser(string identifier)
+    [Command, Summary("Retrieves a Twitter user specified by handle/id")]
+    public async Task GetUser(string identifier, bool verbose = false)
     {
       var user = await TwitterResource.Instance.GetUserAsync(identifier);
       if (user != null)
       {
         var embed = new EmbedBuilder();
         embed.WithAuthor($"{user.Name} (@{user.ScreenNameResponse})", user.ProfileImageUrl, $"https://twitter.com/{user.ScreenNameResponse}");
-        embed.WithDescription(user.Description);
         if (uint.TryParse(user.ProfileLinkColor.Replace("#", ""), System.Globalization.NumberStyles.HexNumber, null, out uint rgb))
         {
           embed.WithColor(new Color(rgb));
         }
 
-        embed.AddField("Created", LogUtil.FormattedDate(user.CreatedAt), true);
-        embed.AddField("Age", user.FormattedAge(), true);
-        embed.AddField("Location", !string.IsNullOrEmpty(user.Location) ? user.Location : "-", true);
-
-        embed.AddField("Verified", user.Verified);
-
-        embed.AddField("Followers", user.FollowersCount, true);
-        embed.AddField("Following", user.FriendsCount, true);
-        embed.AddField("Ratio", user.Ratio().ToString("0.00"), true);
-
-        embed.AddField("Protected", user.Protected);
-
-        embed.AddField("Tweets", user.StatusesCount, true);
-        embed.AddField("Per day", user.TweetsPerDay().ToString("0.00"), true);
-        embed.AddField("Last", user.Status != null ? $"[{LogUtil.FormattedDate(user.Status.CreatedAt)}](https://www.twitter.com/{user.ScreenNameResponse}/status/{user.Status.StatusID})" : "-", true);
-
-        var defs = "-";
-        if (user.DefaultProfile)
+        if (verbose == true)
         {
-          defs = "Using default theme color";
-        }
-        if (user.DefaultProfileImage)
-        {
-          defs += (defs.Length > 0 ? " and" : "Using deafault") + " profile image";
-        }
-        embed.AddField("Defaults", defs);
+          embed.WithDescription(user.Description);
 
-        embed.AddField("Favorites", user.FavoritesCount, true);
-        embed.AddField("Per day", user.FavsPerDay().ToString("0.00"), true);
-        embed.AddField("URL", !string.IsNullOrEmpty(user.Url) ? user.Url : "-", true);
+          embed.AddField("Created", LogUtil.FormattedDate(user.CreatedAt), true);
+          embed.AddField("Age", user.FormattedAge(), true);
+          embed.AddField("Location", !string.IsNullOrEmpty(user.Location) ? user.Location : "-", true);
+
+          embed.AddField("Verified", user.Verified);
+
+          embed.AddField("Followers", user.FollowersCount, true);
+          embed.AddField("Following", user.FriendsCount, true);
+          embed.AddField("Ratio", user.Ratio().ToString("0.00"), true);
+
+          embed.AddField("Protected", user.Protected);
+
+          embed.AddField("Tweets", user.StatusesCount, true);
+          embed.AddField("Per day", user.TweetsPerDay().ToString("0.00"), true);
+          embed.AddField("Last", user.Status != null ? $"[{LogUtil.FormattedDate(user.Status.CreatedAt)}](https://www.twitter.com/{user.ScreenNameResponse}/status/{user.Status.StatusID})" : "-", true);
+
+          var defs = "-";
+          if (user.DefaultProfile)
+          {
+            defs = "Using default theme color";
+          }
+          if (user.DefaultProfileImage)
+          {
+            defs += (defs.Length > 0 ? " and" : "Using deafault") + " profile image";
+          }
+          embed.AddField("Defaults", defs);
+
+          embed.AddField("Favorites", user.FavoritesCount, true);
+          embed.AddField("Per day", user.FavsPerDay().ToString("0.00"), true);
+          embed.AddField("URL", !string.IsNullOrEmpty(user.Url) ? user.Url : "-", true);
+        }
 
         embed.AddField("Score", (long)user.Score());
         embed.WithFooter($"ID: {user.UserIDResponse}", TwitterResource.Instance.Icon);

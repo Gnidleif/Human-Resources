@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace HumanResources.Settings
 {
-  [Group("settings")]
+  [Group("settings"), Alias("ss")]
   [RequireContext(ContextType.Guild)]
   [Remarks("Most of these functions are only accessible by guild administrators")]
   public class Settings : ModuleBase<SocketCommandContext>
   {
-    [Command, Alias("ss"), Summary("Returns the bot settings for the guild")]
+    [Command, Summary("Returns the bot settings for the guild")]
     public async Task GetSettings()
     {
       var cfg = Config.Bot.Guilds[Context.Guild.Id];
@@ -46,18 +46,31 @@ namespace HumanResources.Settings
       await MarkResource.Instance.CheckSetGuild(Context.Guild);
     }
 
-    [Command("marklist"), Alias("mt"), Summary("Set if marked members are also blacklisted or not")]
+    [Command("marklist"), Alias("ml"), Summary("Set if marked members are also blacklisted or not")]
     [RequireUserPermission(GuildPermission.Administrator)]
     public async Task SetMarkList([Summary("True means all marked marked members are blacklisted while marked")] bool state)
     {
       Config.Bot.Guilds[Context.Guild.Id].MarkList = state;
+      var gid = Context.Guild.Id;
+      var list = MarkResource.Instance.GetMarkedByGuild(gid);
+      foreach(var uid in list)
+      {
+        if (state == true)
+        {
+          BlacklistResource.Instance.Push(gid, uid);
+        }
+        else
+        {
+          BlacklistResource.Instance.Pop(gid, uid);
+        }
+      }
       await ReplyAsync($":white_check_mark: Successfully set blacklist on mark to **{state}**");
     }
 
-    [Group("welcome")]
+    [Group("welcome"), Alias("w")]
     public class Welcome : ModuleBase<SocketCommandContext>
     {
-      [Command, Alias("sw"), Summary("Retrieve all welcome settings")]
+      [Command, Summary("Retrieve all welcome settings")]
       public async Task GetWelcome()
       {
         var cfg = Config.Bot.Guilds[Context.Guild.Id].Welcome;
@@ -73,7 +86,7 @@ namespace HumanResources.Settings
         await ReplyAsync("", false, embed.Build());
       }
 
-      [Command("enable"), Alias("swe"), Summary("Enable or disable the welcome functionality")]
+      [Command("enable"), Alias("e"), Summary("Enable or disable the welcome functionality")]
       [RequireUserPermission(GuildPermission.Administrator)]
       public async Task SetEnable([Summary("Set to true to enable")] bool state)
       {
@@ -81,7 +94,7 @@ namespace HumanResources.Settings
         await ReplyAsync(":white_check_mark: Successfully " + (state ? "enabled" : "disabled") + " welcome functionality");
       }
 
-      [Command("time"), Alias("swt"), Summary("Set the amount of minutes it takes before new users are given full server privileges")]
+      [Command("time"), Alias("t"), Summary("Set the amount of minutes it takes before new users are given full server privileges")]
       [RequireUserPermission(GuildPermission.Administrator)]
       public async Task SetTime([Summary("The new time in minutes")] uint time)
       {
@@ -89,7 +102,7 @@ namespace HumanResources.Settings
         await ReplyAsync($":white_check_mark: Successfully set welcome time to **{time} minutes**");
       }
 
-      [Command("role"), Alias("swr"), Summary("Set the first role of new users")]
+      [Command("role"), Alias("r"), Summary("Set the first role of new users")]
       [RequireUserPermission(GuildPermission.Administrator)]
       public async Task SetRole([Summary("The new first role")] IRole role)
       {
@@ -97,7 +110,7 @@ namespace HumanResources.Settings
         await ReplyAsync($":white_check_mark: Successfully set first role to **{role.Name}**");
       }
 
-      [Command("message"), Alias("swm"), Summary("Set the welcome message")]
+      [Command("message"), Alias("m"), Summary("Set the welcome message")]
       public async Task SetMessage([Summary("The new welcome message, leave empty to disable functionality")] [Remainder] string msg = "")
       {
         Config.Bot.Guilds[Context.Guild.Id].Welcome.Message = msg;

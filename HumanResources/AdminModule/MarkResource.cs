@@ -128,6 +128,8 @@ namespace HumanResources.AdminModule
       }
     }
 
+    public List<ulong> GetMarkedByGuild(ulong gid) => this.List.Where(x => x.Key == gid).Select(x => x.Value).FirstOrDefault().ToList();
+
     private async Task Client_GuildMemberUpdated(SocketGuildUser arg1, SocketGuildUser arg2)
     {
       if (string.Compare(arg1.Nickname, arg2.Nickname) == 0)
