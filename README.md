@@ -29,18 +29,18 @@ General purpose Discord bot written in C#
 
 ### Administration - Standard administrative guild functions
 
-* **k**ick <string/ulong> ...reason - Kicks user (**kick**)
-* **b**an <string/ulong> ...reason - Bans user (**ban**)
-* **v**oice **k**ick <string/ulong> ...reason - Voice kick user (**kick**)
-* **v**oice **m**ute <string/ulong> ...reason - Mute user (**mute**)
+* **k**ick <string/ulong> ...string - Kicks user (**kick**)
+* **b**an <string/ulong> ...string - Bans user (**ban**)
+* **v**oice **k**ick <string/ulong> ...string - Voice kick user (**kick**)
+* **v**oice **m**ute <string/ulong> ...string - Mute user (**mute**)
 * **v**oice **m**ute remove <string/ulong> - Removes mute from user (**mute**)
-* **v**oice **d**eafen <string/ulong> ...reason - Deafen user (**deafen**)
+* **v**oice **d**eafen <string/ulong> ...string - Deafen user (**deafen**)
 * **v**oice **d**eafen **r**emove <string/ulong> - Removes deafen from user (**deafen**)
-* **bl**acklist <string/ulong> ...reason - Disable bot usage of user (**admin**)
+* **bl**acklist <string/ulong> ...string - Disable bot usage of user (**admin**)
 * **bl**acklist **r**emove <string/ulong> - Removes user from blacklist (**admin**)
-* **t**ime**o**ut <string/ulong> uint=10 - Set user on timeout (**admin**)
+* **t**ime**o**ut <string/ulong> uint=10 - Set user on timeout, set time to 0 for random 10-5000 (**admin**)
 * **t**ime**o**ut **r**emove <string/ulong> - Removes user from timeout (**admin**)
-* **m**ar**k** <string/ulong> ...reason - Set guild mark on user (**admin**)
+* **m**ar**k** <string/ulong> ...string - Set guild mark on user (**admin**)
 * **m**ar**k** **r**emove <string/ulong> - Remove guild mark from user (**admin**)
 
 ### Twitter - Various Twitter related functions
