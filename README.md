@@ -7,14 +7,14 @@ General purpose Discord bot written in C#
 ### Settings - Get and set server specific settings
 
 * settings - Returns the bot settings for the guild
-* prefix <char> - Set command prefix for the guild (**admin only**)
-* mark <char> - Set mark for the guild (**admin only**)
-* marklist <bool> - Set if marked members are also blacklisted (**admin only**)
+* prefix <char> - Set command prefix for the guild (**admin**)
+* mark <char> - Set mark for the guild (**admin**)
+* marklist <bool> - Set if marked members are also blacklisted (**admin**)
 * settings welcome - Returns all the welcome settings for the guild
-* settings welcome enable <bool> - Enable or disable guild welcome functionality (**admin only**)
-* settings welcome time <uint> - Set the guild welcome time (**admin only**)
-* settings welcome role <string/uint> - Set the first role of new users (**admin only**)
-* settings welcome message <...string> - Set the new guild welcome message (**admin only**)
+* settings welcome enable <bool> - Enable or disable guild welcome functionality (**admin**)
+* settings welcome time <uint> - Set the guild welcome time (**admin**)
+* settings welcome role <string/uint> - Set the first role of new users (**admin**)
+* settings welcome message <...string> - Set the new guild welcome message (**admin**)
 
 ### Administration - Standard administrative guild functions
 
