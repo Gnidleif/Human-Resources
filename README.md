@@ -45,7 +45,7 @@ General purpose Discord bot written in C#
 
 ### Twitter - Various Twitter related functions
 
-* **tw**itter <string/ulong> - Returns information on Twitter user
+* **tw**itter <string/ulong> bool=false - Returns information on Twitter user, set bool to true for verbose
 
 ## Key
 
