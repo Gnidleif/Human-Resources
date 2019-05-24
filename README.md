@@ -38,8 +38,8 @@ General purpose Discord bot written in C#
 * **v**oice **d**eafen **r**emove <string/uint> - Removes deafen from user (**deafen**)
 * **bl**acklist <string/uint> ...reason - Disable bot usage of user (**admin**)
 * **bl**acklist **r**emove <string/uint> - Removes user from blacklist (**admin**)
-* **t**imeout <string/uint> uint=10 - Set user on timeout (**admin**)
-* **t**imeout **r**emove <string/uint> - Removes user from timeout (**admin**)
+* **t**ime**o**ut <string/uint> uint=10 - Set user on timeout (**admin**)
+* **t**ime**o**ut **r**emove <string/uint> - Removes user from timeout (**admin**)
 * **m**ar**k** <string/uint> ...reason - Set guild mark on user (**admin**)
 * **m**ar**k** **r**emove <string/uint> - Remove guild mark from user (**admin**)
 
