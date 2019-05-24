@@ -59,11 +59,11 @@ namespace HumanResources
   {
     public bool Enabled { get; set; } = false;
     public uint Time { get; set; } = 10;
-    public int Position { get; set; } = 0;
+    public int Rank { get; set; } = 0;
     public string Message { get; set; }
     public WelcomeConfig()
     {
-      this.Message = $"Hello! You'll gain full privileges as soon as we're done calibrating.";
+      this.Message = "Welcome! You'll gain full privileges soon.";
     }
   }
 }

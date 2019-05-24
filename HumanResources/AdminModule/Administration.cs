@@ -71,7 +71,7 @@ namespace HumanResources.AdminModule
     [Group("voice")]
     public class Voice : ModuleBase<SocketCommandContext>
     {
-      [Command("kick"), Summary("Disconnect user from voice chat")]
+      [Command("kick"), Alias("vk"), Summary("Disconnect user from voice chat")]
       [RequireBotPermission(GuildPermission.ManageChannels | GuildPermission.MoveMembers)]
       [RequireUserPermission(GuildPermission.KickMembers)]
       public async Task KickUser([Summary("The user to voice kick")] IGuildUser user, [Summary("The reason for the voice kick")] [Remainder] string reason = "")
@@ -115,7 +115,7 @@ namespace HumanResources.AdminModule
       [RequireUserPermission(GuildPermission.MuteMembers)]
       public class Mute : ModuleBase<SocketCommandContext>
       {
-        [Command, Summary("Mutes the specified user")]
+        [Command, Alias("vm"), Summary("Mutes the specified user")]
         public async Task MuteUser([Summary("The user to mute")] IGuildUser user, [Summary("The reason for the mute")] [Remainder] string reason = "")
         {
           if (user.IsMuted == true || user.VoiceChannel == null)
@@ -146,7 +146,7 @@ namespace HumanResources.AdminModule
           await ReplyAsync("", false, embed.Build());
         }
 
-        [Command("remove"), Summary("Unmutes the specified user")]
+        [Command("remove"), Alias("vmr"), Summary("Unmutes the specified user")]
         public async Task UnmuteUser([Summary("The user to unmute")] IGuildUser user)
         {
           if (user.IsSelfMuted == true || user.IsMuted == false || user.VoiceChannel == null)
@@ -171,7 +171,7 @@ namespace HumanResources.AdminModule
       [RequireUserPermission(GuildPermission.DeafenMembers)]
       public class Deafen : ModuleBase<SocketCommandContext>
       {
-        [Command, Summary("Deafens the specified user")]
+        [Command, Alias("vd"), Summary("Deafens the specified user")]
         public async Task DeafenUser([Summary("The user to deafen")] IGuildUser user, [Summary("The reason for the deafening")] [Remainder] string reason = "")
         {
           if (user.IsDeafened == true || user.VoiceChannel == null)
@@ -202,7 +202,7 @@ namespace HumanResources.AdminModule
           await ReplyAsync("", false, embed.Build());
         }
 
-        [Command("remove"), Summary("Undeafens the specified user")]
+        [Command("remove"), Alias("vdr"), Summary("Undeafens the specified user")]
         public async Task UndeafenUser([Summary("The user to undeafen")] IGuildUser user)
         {
           if (user.IsSelfDeafened == true || user.IsDeafened == false || user.VoiceChannel == null)
@@ -225,7 +225,7 @@ namespace HumanResources.AdminModule
     #endregion
 
     #region Blacklist
-    [Group("blacklist"), Summary("Handles the guild blacklist")]
+    [Group("blacklist"), Alias("bl"), Summary("Handles the guild blacklist")]
     [RequireUserPermission(GuildPermission.Administrator)]
     public class Blacklist : ModuleBase<SocketCommandContext>
     {
@@ -247,7 +247,7 @@ namespace HumanResources.AdminModule
         }
       }
 
-      [Command("remove"), Summary("Remove user from blacklist")]
+      [Command("remove"), Alias("bl"), Summary("Remove user from blacklist")]
       public async Task WhitelistUser([Summary("The user to blacklist")] IGuildUser user)
       {
         if (!BlacklistResource.Instance.Pop(user.GuildId, user.Id))
@@ -259,7 +259,7 @@ namespace HumanResources.AdminModule
     #endregion
 
     #region Timeout
-    [Group("timeout"), Summary("Handles putting and removing people from timeout")]
+    [Group("timeout"), Alias("t"), Summary("Handles putting and removing people from timeout")]
     [RequireUserPermission(GuildPermission.Administrator)]
     public class Timeout : ModuleBase<SocketCommandContext>
     {
@@ -295,7 +295,7 @@ namespace HumanResources.AdminModule
         await ReplyAsync("", false, embed.Build());
       }
 
-      [Command("remove"), Summary("Removes timeout from specified user")]
+      [Command("remove"), Alias("tr"), Summary("Removes timeout from specified user")]
       [RequireBotPermission(GuildPermission.ManageRoles)]
       public async Task UntimeoutUser([Summary("The user to remove from timeout")] IGuildUser user)
       {

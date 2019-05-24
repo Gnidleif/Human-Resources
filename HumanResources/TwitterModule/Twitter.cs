@@ -10,7 +10,7 @@ namespace HumanResources.TwitterModule
   [Group("twitter")]
   public class Twitter : ModuleBase<SocketCommandContext>
   {
-    [Command, Summary("Retrieves a Twitter user specified by handle/id")]
+    [Command, Alias("tw"), Summary("Retrieves a Twitter user specified by handle/id")]
     public async Task GetUser(string identifier)
     {
       var user = await TwitterResource.Instance.GetUserAsync(identifier);
@@ -23,15 +23,49 @@ namespace HumanResources.TwitterModule
         {
           embed.WithColor(new Color(rgb));
         }
+
+        embed.AddField("Created", LogUtil.FormattedDate(user.CreatedAt), true);
+        embed.AddField("Age", user.FormattedAge(), true);
+        embed.AddField("Location", !string.IsNullOrEmpty(user.Location) ? user.Location : "-", true);
+
+        embed.AddField("Verified", user.Verified);
+
+        embed.AddField("Followers", user.FollowersCount, true);
+        embed.AddField("Following", user.FriendsCount, true);
+        embed.AddField("Ratio", user.Ratio().ToString("0.00"), true);
+
+        embed.AddField("Protected", user.Protected);
+
+        embed.AddField("Tweets", user.StatusesCount, true);
+        embed.AddField("Per day", user.TweetsPerDay().ToString("0.00"), true);
+        embed.AddField("Last", user.Status != null ? $"[{LogUtil.FormattedDate(user.Status.CreatedAt)}](https://www.twitter.com/{user.ScreenNameResponse}/status/{user.Status.StatusID})" : "-", true);
+
+        var defs = "-";
+        if (user.DefaultProfile)
+        {
+          defs = "Using default theme color";
+        }
+        if (user.DefaultProfileImage)
+        {
+          defs += (defs.Length > 0 ? " and" : "Using deafault") + " profile image";
+        }
+        embed.AddField("Defaults", defs);
+
+        embed.AddField("Favorites", user.FavoritesCount, true);
+        embed.AddField("Per day", user.FavsPerDay().ToString("0.00"), true);
+        embed.AddField("URL", !string.IsNullOrEmpty(user.Url) ? user.Url : "-", true);
+
+        embed.AddField("Score", (long)user.Score());
         embed.WithFooter($"ID: {user.UserIDResponse}", TwitterResource.Instance.Icon);
 
         await ReplyAsync("", false, embed.Build());
       }
     }
 
+    // deactivated until fixed
     [Group("stalk")]
     [RequireUserPermission(GuildPermission.Administrator)]
-    public class Stalk : ModuleBase<SocketCommandContext>
+    private class Stalk : ModuleBase<SocketCommandContext>
     {
       [Command, Summary("Start outputting any tweets a specified user does in the given channel")]
       public async Task StalkUser(string identifier, IMessageChannel ch)

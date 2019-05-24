@@ -71,6 +71,7 @@ namespace HumanResources
 
     private async Task Client_LatencyUpdated(int arg1, int arg2)
     {
+      _ = Config.Save();
       this.Resources.ForEach(x => x.Save());
       await Task.CompletedTask;
     }
@@ -82,7 +83,7 @@ namespace HumanResources
       {
         try
         {
-          var firstRole = arg.Guild.Roles.First(x => x.Position == wait.Position);
+          var firstRole = arg.Guild.Roles.First(x => x.Position == wait.Rank);
           await arg.AddRoleAsync(firstRole);
         }
         catch (Exception e)

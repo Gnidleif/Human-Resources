@@ -13,7 +13,7 @@ namespace HumanResources.Settings
   [Remarks("Most of these functions are only accessible by guild administrators")]
   public class Settings : ModuleBase<SocketCommandContext>
   {
-    [Command, Summary("Returns the bot settings for the guild")]
+    [Command, Alias("ss"), Summary("Returns the bot settings for the guild")]
     public async Task GetSettings()
     {
       var cfg = Config.Bot.Guilds[Context.Guild.Id];
@@ -29,7 +29,7 @@ namespace HumanResources.Settings
       await ReplyAsync("", false, embed.Build());
     }
 
-    [Command("prefix"), Summary("Set command prefix for the guild")]
+    [Command("prefix"), Alias("px"), Summary("Set command prefix for the guild")]
     [RequireUserPermission(GuildPermission.Administrator)]
     public async Task SetPrefix([Summary("The new prefix")] char prefix)
     {
@@ -37,7 +37,7 @@ namespace HumanResources.Settings
       await ReplyAsync($":white_check_mark: Successfully set prefix to **{prefix}**");
     }
 
-    [Command("mark"), Summary("Set mark for the guild")]
+    [Command("mark"), Alias("mk"), Summary("Set mark for the guild")]
     [RequireUserPermission(GuildPermission.Administrator)]
     public async Task SetMark([Summary("The new mark")] char mark)
     {
@@ -46,7 +46,7 @@ namespace HumanResources.Settings
       await MarkResource.Instance.CheckSetGuild(Context.Guild);
     }
 
-    [Command("marklist"), Summary("Set if marked members are also blacklisted or not")]
+    [Command("marklist"), Alias("mt"), Summary("Set if marked members are also blacklisted or not")]
     [RequireUserPermission(GuildPermission.Administrator)]
     public async Task SetMarkList([Summary("True means all marked marked members are blacklisted while marked")] bool state)
     {
@@ -57,7 +57,7 @@ namespace HumanResources.Settings
     [Group("welcome")]
     public class Welcome : ModuleBase<SocketCommandContext>
     {
-      [Command, Summary("Retrieve all welcome settings")]
+      [Command, Alias("sw"), Summary("Retrieve all welcome settings")]
       public async Task GetWelcome()
       {
         var cfg = Config.Bot.Guilds[Context.Guild.Id].Welcome;
@@ -66,14 +66,14 @@ namespace HumanResources.Settings
         embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl());
         embed.AddField("Enabled", $"**{cfg.Enabled}**", true);
         embed.AddField("Time", $"**{cfg.Time}**", true);
-        embed.AddField("Base role", $"**{Context.Guild.GetRole(Context.Guild.Roles.Where(x => x.Position == cfg.Position).Select(x => x.Id).Single()).Name}**", true);
+        embed.AddField("Base role", $"**{Context.Guild.GetRole(Context.Guild.Roles.Where(x => x.Position == cfg.Rank).Select(x => x.Id).Single()).Name}**", true);
         embed.AddField("Message", cfg.Message);
         embed.WithFooter(LogUtil.LogTime);
 
         await ReplyAsync("", false, embed.Build());
       }
 
-      [Command("enable"), Summary("Enable or disable the welcome functionality")]
+      [Command("enable"), Alias("swe"), Summary("Enable or disable the welcome functionality")]
       [RequireUserPermission(GuildPermission.Administrator)]
       public async Task SetEnable([Summary("Set to true to enable")] bool state)
       {
@@ -81,7 +81,7 @@ namespace HumanResources.Settings
         await ReplyAsync(":white_check_mark: Successfully " + (state ? "enabled" : "disabled") + " welcome functionality");
       }
 
-      [Command("time"), Summary("Set the amount of minutes it takes before new users are given full server privileges")]
+      [Command("time"), Alias("swt"), Summary("Set the amount of minutes it takes before new users are given full server privileges")]
       [RequireUserPermission(GuildPermission.Administrator)]
       public async Task SetTime([Summary("The new time in minutes")] uint time)
       {
@@ -89,15 +89,15 @@ namespace HumanResources.Settings
         await ReplyAsync($":white_check_mark: Successfully set welcome time to **{time} minutes**");
       }
 
-      [Command("role"), Summary("Set the original role of new users")]
+      [Command("role"), Alias("swr"), Summary("Set the first role of new users")]
       [RequireUserPermission(GuildPermission.Administrator)]
-      public async Task SetRole([Summary("The new original role")] IRole role)
+      public async Task SetRole([Summary("The new first role")] IRole role)
       {
-        Config.Bot.Guilds[Context.Guild.Id].Welcome.Position = role.Position;
-        await ReplyAsync($":white_check_mark: Successfully set original role to **{role.Name}**");
+        Config.Bot.Guilds[Context.Guild.Id].Welcome.Rank = role.Position;
+        await ReplyAsync($":white_check_mark: Successfully set first role to **{role.Name}**");
       }
 
-      [Command("message"), Summary("Set the welcome message")]
+      [Command("message"), Alias("swm"), Summary("Set the welcome message")]
       public async Task SetMessage([Summary("The new welcome message, leave empty to disable functionality")] [Remainder] string msg = "")
       {
         Config.Bot.Guilds[Context.Guild.Id].Welcome.Message = msg;
