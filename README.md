@@ -15,7 +15,7 @@ General purpose Discord bot written in C#
 
 ## Features
 
-### Settings - Get and set server specific settings
+### Settings - Get and set guild specific settings
 
 * **s**etting**s** - Returns the bot settings for the guild
 * **p**refi**x** <char> - Set command prefix for the guild (**admin**)
@@ -55,6 +55,7 @@ General purpose Discord bot written in C#
 * ... - Can contain spaces
 * (**ABC**) - Requires permission ABC
 * ABC=X - Parameter ABC has default value X
+* **C**ommand**N**ame - Bold letters alias of command
 
 ### Data types
 
