@@ -100,9 +100,21 @@ namespace HumanResources.TwitterModule
 
     public async Task<User> GetUserAsync(string identifier)
     {
+      User user = null;
       var query = this.Ctx.User.Where(t => t.Type == UserType.Show);
-      query = ulong.TryParse(identifier, out ulong id) ? query.Where(t => t.UserID == id) : query.Where(t => t.ScreenName == identifier);
-      return await query.SingleOrDefaultAsync();
+      try
+      {
+        if (ulong.TryParse(identifier, out ulong id))
+        {
+          user = await query.Where(t => t.UserID == id).SingleOrDefaultAsync();
+        }
+        return user ?? await query.Where(t => t.ScreenName == identifier).SingleOrDefaultAsync();
+      }
+      catch (Exception e)
+      {
+        LogUtil.Write("TwitterResources:GetUserAsync", e.Message);
+      }
+      return null;
     }
 
     public async Task<List<User>> GetUsersByChannelIdAsync(ulong cid)
