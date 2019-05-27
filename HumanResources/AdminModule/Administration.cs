@@ -13,7 +13,7 @@ namespace HumanResources.AdminModule
     [Command("kick"), Alias("k"), Summary("Kicks the specified user")]
     [RequireBotPermission(GuildPermission.KickMembers)]
     [RequireUserPermission(GuildPermission.KickMembers)]
-    public async Task KickUser([Summary("The user to kick")] IGuildUser user, [Summary("The reason for the kick")] [Remainder] string reason = "")
+    public async Task KickUser(IGuildUser user, [Remainder] string reason = "")
     {
       try
       {
@@ -41,7 +41,7 @@ namespace HumanResources.AdminModule
     [Command("ban"), Alias("b"), Summary("Bans the specified user")]
     [RequireBotPermission(GuildPermission.BanMembers)]
     [RequireUserPermission(GuildPermission.BanMembers)]
-    public async Task BanUser([Summary("The user to ban")] IGuildUser user, [Summary("The reason for the ban")] [Remainder] string reason = "")
+    public async Task BanUser(IGuildUser user,[Remainder] string reason = "")
     {
       try
       {
@@ -68,13 +68,13 @@ namespace HumanResources.AdminModule
     #endregion
 
     #region Voice
-    [Group("voice"), Alias("v")]
+    [Group("voice"), Alias("v"), Summary("Commands related to voice chat")]
     public class Voice : ModuleBase<SocketCommandContext>
     {
       [Command("kick"), Alias("k"), Summary("Disconnect user from voice chat")]
       [RequireBotPermission(GuildPermission.ManageChannels | GuildPermission.MoveMembers)]
       [RequireUserPermission(GuildPermission.KickMembers)]
-      public async Task KickUser([Summary("The user to voice kick")] IGuildUser user, [Summary("The reason for the voice kick")] [Remainder] string reason = "")
+      public async Task KickUser(IGuildUser user,[Remainder] string reason = "")
       {
         if (user.VoiceChannel == null)
         {
@@ -110,13 +110,13 @@ namespace HumanResources.AdminModule
         await ReplyAsync("", false, embed.Build());
       }
 
-      [Group("mute"), Alias("m")]
+      [Group("mute"), Alias("m"), Summary("Functions related to muting users")]
       [RequireBotPermission(GuildPermission.MuteMembers)]
       [RequireUserPermission(GuildPermission.MuteMembers)]
       public class Mute : ModuleBase<SocketCommandContext>
       {
         [Command, Summary("Mutes the specified user")]
-        public async Task MuteUser([Summary("The user to mute")] IGuildUser user, [Summary("The reason for the mute")] [Remainder] string reason = "")
+        public async Task MuteUser(IGuildUser user,[Remainder] string reason = "")
         {
           if (user.IsMuted == true || user.VoiceChannel == null)
           {
@@ -147,7 +147,7 @@ namespace HumanResources.AdminModule
         }
 
         [Command("remove"), Alias("r"), Summary("Unmutes the specified user")]
-        public async Task UnmuteUser([Summary("The user to unmute")] IGuildUser user)
+        public async Task UnmuteUser(IGuildUser user)
         {
           if (user.IsSelfMuted == true || user.IsMuted == false || user.VoiceChannel == null)
           {
@@ -166,13 +166,13 @@ namespace HumanResources.AdminModule
         }
       }
 
-      [Group("deafen"), Alias("d")]
+      [Group("deafen"), Alias("d"), Summary("Functions related to deafening users")]
       [RequireBotPermission(GuildPermission.DeafenMembers)]
       [RequireUserPermission(GuildPermission.DeafenMembers)]
       public class Deafen : ModuleBase<SocketCommandContext>
       {
         [Command, Summary("Deafens the specified user")]
-        public async Task DeafenUser([Summary("The user to deafen")] IGuildUser user, [Summary("The reason for the deafening")] [Remainder] string reason = "")
+        public async Task DeafenUser(IGuildUser user,[Remainder] string reason = "")
         {
           if (user.IsDeafened == true || user.VoiceChannel == null)
           {
@@ -230,7 +230,7 @@ namespace HumanResources.AdminModule
     public class Blacklist : ModuleBase<SocketCommandContext>
     {
       [Command, Summary("Blacklists user from bot usage")]
-      public async Task BlacklistUser([Summary("The user to blacklist")] IGuildUser user, [Summary("The reason for the blacklisting")] [Remainder] string reason = "")
+      public async Task BlacklistUser(IGuildUser user,[Remainder] string reason = "")
       {
         if (BlacklistResource.Instance.Push(user.GuildId, user.Id))
         {
@@ -248,7 +248,7 @@ namespace HumanResources.AdminModule
       }
 
       [Command("remove"), Alias("r"), Summary("Remove user from blacklist")]
-      public async Task WhitelistUser([Summary("The user to blacklist")] IGuildUser user)
+      public async Task WhitelistUser(IGuildUser user)
       {
         if (!BlacklistResource.Instance.Pop(user.GuildId, user.Id))
         {
@@ -265,7 +265,7 @@ namespace HumanResources.AdminModule
     {
       [Command, Summary("Sets the specified user in timeout")]
       [RequireBotPermission(GuildPermission.ManageRoles)]
-      public async Task TimeoutUser([Summary("The user to set on timeout")] IGuildUser user, [Summary("Minutes the timeout will last, 0 gives a random number between 10 and 5000")] uint minutes = 10, [Remainder] string reason = "")
+      public async Task TimeoutUser(IGuildUser user,uint minutes = 10, [Remainder] string reason = "")
       {
         if (minutes == 0)
         {
@@ -301,7 +301,7 @@ namespace HumanResources.AdminModule
 
       [Command("remove"), Alias("r"), Summary("Removes timeout from specified user")]
       [RequireBotPermission(GuildPermission.ManageRoles)]
-      public async Task UntimeoutUser([Summary("The user to remove from timeout")] IGuildUser user)
+      public async Task UntimeoutUser(IGuildUser user)
       {
         try
         {
@@ -323,7 +323,7 @@ namespace HumanResources.AdminModule
     {
       [Command, Summary("Marks specified user")]
       [RequireBotPermission(GuildPermission.ManageNicknames)]
-      public async Task MarkUser([Summary("The user to set a mark on")] IGuildUser user, [Summary("The reason for marking the user")] string reason = "")
+      public async Task MarkUser(IGuildUser user, string reason = "")
       {
         if (Config.Bot.Guilds[user.GuildId].MarkList)
         {

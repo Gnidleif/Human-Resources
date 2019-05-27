@@ -6,7 +6,7 @@ namespace HumanResources.SettingsModule
 {
   public class Help : ModuleBase<SocketCommandContext>
   {
-    [Command("help"), Summary("Retrieve list of bot information")]
+    [Command("help"), Alias("h"), Summary("Returns link to Github repo")]
     public async Task GetHelp()
     {
       var embed = new EmbedBuilder();

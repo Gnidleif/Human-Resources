@@ -8,9 +8,8 @@ using System.Threading.Tasks;
 
 namespace HumanResources.Settings
 {
-  [Group("settings"), Alias("ss")]
+  [Group("settings"), Alias("s")]
   [RequireContext(ContextType.Guild)]
-  [Remarks("Most of these functions are only accessible by guild administrators")]
   public class Settings : ModuleBase<SocketCommandContext>
   {
     [Command, Summary("Returns the bot settings for the guild")]

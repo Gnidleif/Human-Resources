@@ -1,7 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
 using HumanResources.Utilities;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,7 +18,7 @@ namespace HumanResources.TwitterModule
       {
         var embed = new EmbedBuilder();
         embed.WithAuthor($"{user.Name} (@{user.ScreenNameResponse})", user.ProfileImageUrl, $"https://twitter.com/{user.ScreenNameResponse}");
-        if (uint.TryParse(user.ProfileLinkColor.Replace("#", ""), System.Globalization.NumberStyles.HexNumber, null, out uint rgb))
+        if (uint.TryParse(user.ProfileLinkColor.Replace("#", ""), NumberStyles.HexNumber, null, out uint rgb))
         {
           embed.WithColor(new Color(rgb));
         }
@@ -51,7 +50,7 @@ namespace HumanResources.TwitterModule
           }
           if (user.DefaultProfileImage)
           {
-            defs += (defs.Length > 0 ? " and" : "Using deafault") + " profile image";
+            defs += (defs.Length > 1 ? " and" : "Using default") + " profile image";
           }
           embed.AddField("Defaults", defs);
 

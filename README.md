@@ -17,15 +17,16 @@ General purpose Discord bot written in C#
 
 ### Settings - Get and set guild specific settings
 
-* **s**etting**s** - Returns the bot settings for the guild
-* **s**etting**s** **p**refi**x** <char> - Set command prefix for the guild (**admin**)
-* **s**etting**s** **m**ar**k** <char> - Set mark for the guild (**admin**)
-* **s**etting**s** **m**ark**l**ist <bool> - Set if marked members are also blacklisted (**admin**)
-* **s**etting**s** **w**elcome - Returns all the welcome settings for the guild
-* **s**etting**s** **w**elcome **e**nable <bool> - Enable or disable guild welcome functionality (**admin**)
-* **s**etting**s** **w**elcome **t**ime <ulong> - Set the guild welcome time (**admin**)
-* **s**etting**s** **w**elcome **r**ole <string/ulong> - Set the first role of new users (**admin**)
-* **s**etting**s** **w**elcome **m**essage <...string> - Set the new guild welcome message (**admin**)
+* **h**elp - Returns link to this Github repository
+* **s**ettings - Returns the bot settings for the guild
+* **s**ettings **p**refi**x** <char> - Set command prefix for the guild (**admin**)
+* **s**ettings **m**ar**k** <char> - Set mark for the guild (**admin**)
+* **s**ettings **m**ark**l**ist <bool> - Set if marked members are also blacklisted (**admin**)
+* **s**ettings **w**elcome - Returns all the welcome settings for the guild
+* **s**ettings **w**elcome **e**nable <bool> - Enable or disable guild welcome functionality (**admin**)
+* **s**ettings **w**elcome **t**ime <ulong> - Set the guild welcome time (**admin**)
+* **s**ettings **w**elcome **r**ole <string/ulong> - Set the first role of new users (**admin**)
+* **s**ettings **w**elcome **m**essage <...string> - Set the new guild welcome message (**admin**)
 
 ### Administration - Standard administrative guild functions
 
@@ -47,6 +48,10 @@ General purpose Discord bot written in C#
 
 * **tw**itter <string/ulong> bool=false - Returns information on Twitter user, set bool to true for verbose
 
+### General
+
+* **s**ponge**b**ob <...string> - Spongebobbify text input
+
 ## Key
 
 ### Parameters
@@ -55,7 +60,7 @@ General purpose Discord bot written in C#
 * ... - Can contain spaces
 * (**ABC**) - Requires permission ABC
 * ABC=X - Parameter ABC has default value X
-* **C**ommand**N**ame - Bold letters alias of command
+* **c**omman**d** **n**ame - Bold letters signify alias of command, spaces are included so the example alias is "cd n"
 
 ### Data types
 
