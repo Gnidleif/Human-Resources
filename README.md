@@ -10,7 +10,7 @@ General purpose Discord bot written in C#
 * Welcome
   * Enabled - false
   * Time - 10
-  * Rank - @everyone
+  * Rank - First
   * Message - Welcome! You'll gain full privileges soon.
 
 ## Features
@@ -33,7 +33,7 @@ General purpose Discord bot written in C#
 * **b**an <string/ulong> ...string - Bans user (**ban**)
 * **v**oice **k**ick <string/ulong> ...string - Voice kick user (**kick**)
 * **v**oice **m**ute <string/ulong> ...string - Mute user (**mute**)
-* **v**oice **m**ute remove <string/ulong> - Removes mute from user (**mute**)
+* **v**oice **m**ute **r**emove <string/ulong> - Removes mute from user (**mute**)
 * **v**oice **d**eafen <string/ulong> ...string - Deafen user (**deafen**)
 * **v**oice **d**eafen **r**emove <string/ulong> - Removes deafen from user (**deafen**)
 * **bl**acklist <string/ulong> ...string - Disable bot usage of user (**admin**)

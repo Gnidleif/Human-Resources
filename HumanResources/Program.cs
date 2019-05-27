@@ -1,12 +1,12 @@
-﻿using Discord.WebSocket;
-using HumanResources.Utilities;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
+﻿using HumanResources.Utilities;
 using HumanResources.AdminModule;
-using Discord;
 using HumanResources.TwitterModule;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System;
+using Discord.WebSocket;
+using Discord;
+using System.Linq;
 
 namespace HumanResources
 {

@@ -2,6 +2,7 @@
 using Discord.Commands;
 using HumanResources.Utilities;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -35,12 +36,12 @@ namespace HumanResources.TwitterModule
 
           embed.AddField("Followers", user.FollowersCount, true);
           embed.AddField("Following", user.FriendsCount, true);
-          embed.AddField("Ratio", user.Ratio().ToString("0.00"), true);
+          embed.AddField("Ratio", user.Ratio().ToString("0.00", CultureInfo.InvariantCulture), true);
 
           embed.AddField("Protected", user.Protected);
 
           embed.AddField("Tweets", user.StatusesCount, true);
-          embed.AddField("Per day", user.TweetsPerDay().ToString("0.00"), true);
+          embed.AddField("Per day", user.TweetsPerDay().ToString("0.00", CultureInfo.InvariantCulture), true);
           embed.AddField("Last", user.Status != null ? $"[{LogUtil.FormattedDate(user.Status.CreatedAt)}](https://www.twitter.com/{user.ScreenNameResponse}/status/{user.Status.StatusID})" : "-", true);
 
           var defs = "-";
@@ -55,7 +56,7 @@ namespace HumanResources.TwitterModule
           embed.AddField("Defaults", defs);
 
           embed.AddField("Favorites", user.FavoritesCount, true);
-          embed.AddField("Per day", user.FavsPerDay().ToString("0.00"), true);
+          embed.AddField("Per day", user.FavsPerDay().ToString("0.00", CultureInfo.InvariantCulture), true);
           embed.AddField("URL", !string.IsNullOrEmpty(user.Url) ? user.Url : "-", true);
         }
 
