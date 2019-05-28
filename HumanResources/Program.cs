@@ -7,6 +7,7 @@ using System;
 using Discord.WebSocket;
 using Discord;
 using System.Linq;
+using HumanResources.ReactionsModule;
 
 namespace HumanResources
 {
@@ -60,6 +61,7 @@ namespace HumanResources
         BlacklistResource.Instance,
         TimeoutResource.Instance,
         TwitterResource.Instance,
+        ReactionResource.Instance,
       };
       AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
 

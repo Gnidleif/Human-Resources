@@ -10,7 +10,7 @@ namespace HumanResources.SettingsModule
     public async Task GetHelp()
     {
       var embed = new EmbedBuilder();
-      embed.WithAuthor("Github project page", Context.Client.CurrentUser.GetAvatarUrl() ?? Context.Client.CurrentUser.GetDefaultAvatarUrl(), "https://github.com/Gnidleif/Human-Resources");
+      embed.WithAuthor("Click here for help", Context.Client.CurrentUser.GetAvatarUrl() ?? Context.Client.CurrentUser.GetDefaultAvatarUrl(), "https://github.com/Gnidleif/Human-Resources");
       await ReplyAsync("", false, embed.Build());
     }
   }

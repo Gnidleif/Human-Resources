@@ -52,6 +52,12 @@ General purpose Discord bot written in C#
 
 * **s**ponge**b**ob <...string> - Spongebobbify text input
 
+### React - Make the bot react to certain phrases
+
+* **r**eact - Get list of reactions for the current guild  (**admin**)
+* **r**eact **a**dd <regex> <...string> - Add bot guild reaction (**admin**)
+* **r**eact **r**emove <regex> - Remove bot guild reaction (**admin**)
+
 ## Key
 
 ### Parameters
@@ -69,3 +75,4 @@ General purpose Discord bot written in C#
 * uint - Number between 0 and 4294967295
 * ulong - Number between 0 and 18446744073709551615
 * string - String of characters
+* regex - Regular expression

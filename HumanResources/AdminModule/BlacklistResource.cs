@@ -10,8 +10,7 @@ namespace HumanResources.AdminModule
   class BlacklistResource : IStaticResource
   {
     private static readonly Lazy<BlacklistResource> lazy = new Lazy<BlacklistResource>(() => new BlacklistResource());
-    private const string Name = "blacklist.json";
-    private readonly string Path = $"{Global.ResourceFolder}/{Name}";
+    private readonly string Path = $"{Global.ResourceFolder}/blacklist.json";
 
     public static BlacklistResource Instance { get { return lazy.Value; } }
     public Dictionary<ulong, HashSet<ulong>> List { get; set; }

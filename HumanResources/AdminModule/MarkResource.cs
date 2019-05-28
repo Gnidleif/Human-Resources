@@ -13,8 +13,7 @@ namespace HumanResources.AdminModule
   public sealed class MarkResource : IStaticResource
   {
     private static readonly Lazy<MarkResource> lazy = new Lazy<MarkResource>(() => new MarkResource());
-    private const string Name = "marked.json";
-    private readonly string Path = $"{Global.ResourceFolder}/{Name}";
+    private readonly string Path = $"{Global.ResourceFolder}/marked.json";
     private Dictionary<ulong, HashSet<ulong>> List { get; set; }
 
     public static MarkResource Instance { get { return lazy.Value; } }

@@ -13,8 +13,7 @@ namespace HumanResources.AdminModule
   class TimeoutResource : IStaticResource
   {
     private static readonly Lazy<TimeoutResource> lazy = new Lazy<TimeoutResource>(() => new TimeoutResource());
-    private const string Name = "timeouts.json";
-    private readonly string Path = $"{Global.ResourceFolder}/{Name}";
+    private readonly string Path = $"{Global.ResourceFolder}/timeout.json";
     private Dictionary<ulong, Dictionary<ulong, TimeoutMember>> List { get; set; }
 
     public static TimeoutResource Instance { get { return lazy.Value; } }
@@ -204,9 +203,9 @@ namespace HumanResources.AdminModule
 
   public class TimeoutMember
   {
-    public List<ulong> RoleIds = new List<ulong>();
-    public DateTime Time;
+    public List<ulong> RoleIds { get; set; } = new List<ulong>();
+    public DateTime Time { get; set; }
     [JsonIgnore]
-    public Timer Tick;
+    public Timer Tick { get; set; }
   }
 }

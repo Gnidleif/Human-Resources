@@ -11,8 +11,7 @@ namespace HumanResources.TwitterModule
   public class TwitterResource : IStaticResource
   {
     private static readonly Lazy<TwitterResource> lazy = new Lazy<TwitterResource>(() => new TwitterResource());
-    private const string Name = "twitter.json";
-    private readonly string Path = $"{Global.ResourceFolder}/{Name}";
+    private readonly string Path = $"{Global.ResourceFolder}/twitter.json";
     private TwitterInfo Info { get; set; } = new TwitterInfo();
     private TwitterContext Ctx { get; set; }
 

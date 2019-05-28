@@ -2,8 +2,10 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using HumanResources.AdminModule;
+using HumanResources.ReactionsModule;
 using HumanResources.Utilities;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace HumanResources
@@ -20,6 +22,9 @@ namespace HumanResources
         DefaultRunMode = RunMode.Async,
         LogLevel = Discord.LogSeverity.Verbose,
       });
+
+      this.Service.AddTypeReader(typeof(Regex), new RegexTypeReader());
+
       await this.Service.AddModulesAsync(Assembly.GetEntryAssembly(), null);
 
       Global.Client.MessageReceived += Client_MessageReceived;
@@ -34,7 +39,18 @@ namespace HumanResources
       }
 
       var ctx = new SocketCommandContext(Global.Client, msg);
-      if (ctx.User.IsBot || BlacklistResource.Instance.Contains(ctx.Guild.Id, ctx.User.Id))
+      if (ctx.User.IsBot)
+      {
+        return;
+      }
+
+      var resp = string.Join("\n", ReactionResource.Instance.Find(ctx.Guild.Id, msg.Content));
+      if (!string.IsNullOrEmpty(resp))
+      {
+        await ctx.Channel.SendMessageAsync(resp);
+      }
+
+      if (BlacklistResource.Instance.Contains(ctx.Guild.Id, ctx.User.Id))
       {
         return;
       }
