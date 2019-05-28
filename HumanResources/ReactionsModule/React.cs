@@ -2,8 +2,6 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using HumanResources.Utilities;
-using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -20,10 +18,12 @@ namespace HumanResources.ReactionsModule
     {
       var l = ReactionResource.Instance.GetGuild(Context.Guild.Id);
       var sb = new StringBuilder();
+      sb.AppendLine("```");
       foreach(var rh in l)
       {
         sb.AppendLine($"{rh.Rgx.ToString()}: {rh.Phrase}");
       }
+      sb.AppendLine("```");
       var embed = new EmbedBuilder();
       var user = Context.User as SocketGuildUser;
       embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
