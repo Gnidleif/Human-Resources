@@ -1,4 +1,5 @@
 ﻿using HumanResources.Utilities;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -55,28 +56,31 @@ namespace HumanResources.ReactionsModule
 
     public bool Pop(ulong gid) => this.List.Remove(gid);
 
-    public bool Push(ulong gid, ulong hash)
+    public bool Push(ulong gid, ulong id)
     {
+      if (id == default)
+      {
+        return false;
+      }
       if (!this.List.ContainsKey(gid))
       {
         this.List.Add(gid, new Dictionary<ulong, ReactionHelper>());
       }
-      if (!this.List[gid].ContainsKey(hash))
+      if (!this.List[gid].ContainsKey(id))
       {
-        this.List[gid].Add(hash, null);
+        this.List[gid].Add(id, null);
         return true;
       }
       return false;
     }
 
-    public bool Push(ulong gid, Regex rgx, string p)
+    public bool Push(ulong gid, ulong id, Regex rgx, string p)
     {
-      var hash = (ulong)rgx.ToString().GetHashCode();
-      if (!this.Push(gid, hash))
+      if (!this.Push(gid, id))
       {
         return false;
       }
-      this.List[gid][hash] = new ReactionHelper
+      this.List[gid][id] = new ReactionHelper
       {
         Rgx = rgx,
         Phrase = p,
@@ -103,7 +107,14 @@ namespace HumanResources.ReactionsModule
       return result;
     }
 
-    public List<ReactionHelper> GetGuild(ulong gid) => this.List[gid]?.Values.ToList();
+    public string ToJson(ulong gid, ulong id)
+    {
+      if (id == default)
+      {
+        return JsonConvert.SerializeObject(this.List[gid], Formatting.Indented);
+      }
+      return this.Contains(gid, id) ? JsonConvert.SerializeObject(this.List[gid][id], Formatting.Indented) : string.Empty;
+    }
   }
 
   public class ReactionHelper
