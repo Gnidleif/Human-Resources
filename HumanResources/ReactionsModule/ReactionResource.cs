@@ -98,16 +98,6 @@ namespace HumanResources.ReactionsModule
       return false;
     }
 
-    public bool Enable(ulong gid, ulong id, bool state)
-    {
-      if (this.Contains(gid, id))
-      {
-        this.List[gid][id].Enabled = state;
-        return true;
-      }
-      return false;
-    }
-
     public bool Save() => JsonUtil.TryWrite(this.Path, this.List);
 
     public List<string> Find(ulong gid, string words)
@@ -117,12 +107,10 @@ namespace HumanResources.ReactionsModule
       {
         return result;
       }
-      foreach(var obj in this.List[gid].Values)
+      var l = this.List[gid].Values.Where(x => x.Phrases.Count > 0 && x.Enabled == true && x.Rgx.IsMatch(words));
+      foreach(var obj in l)
       {
-        if (obj.Enabled && obj.Rgx.IsMatch(words))
-        {
-          result.Add(obj.GetRandom(new Random(DateTime.UtcNow.Millisecond)));
-        }
+        result.Add(obj.GetRandom(new Random(DateTime.UtcNow.Millisecond)));
       }
       return result;
     }
@@ -135,13 +123,53 @@ namespace HumanResources.ReactionsModule
       }
       return this.Contains(gid, id) ? JsonConvert.SerializeObject(this.List[gid][id], Formatting.Indented) : string.Empty;
     }
+
+    public bool Modify(ulong gid, ulong id, bool state)
+    {
+      if (!this.Contains(gid, id))
+      {
+        return false;
+      }
+      this.List[gid][id].Enabled = state;
+      return true;
+    }
+
+    public bool Modify(ulong gid, ulong id, Regex rgx)
+    {
+      if (!this.Contains(gid, id))
+      {
+        return false;
+      }
+      this.List[gid][id].Rgx = rgx;
+      return true;
+    }
+
+    public bool Modify(ulong gid, ulong id, int idx, string phrase)
+    {
+      if (!this.Contains(gid, id) || this.List[gid][id].Phrases.Count <= idx)
+      {
+        return false;
+      }
+      this.List[gid][id].Phrases[idx] = phrase;
+      return true;
+    }
+
+    public bool Pop(ulong gid, ulong id, int idx)
+    {
+      if (!this.Contains(gid, id) || this.List[gid][id].Phrases.Count <= idx)
+      {
+        return false;
+      }
+      this.List[gid][id].Phrases.RemoveAt(idx);
+      return true;
+    }
   }
 
   public class ReactionHelper
   {
     public Regex Rgx { get; set; }
     public List<string> Phrases { get; set; }
-    public bool Enabled { get; set; }
+    public bool Enabled { get; set; } = true;
     public string GetRandom(Random rand) => this.Phrases[rand.Next(0, this.Phrases.Count)];
   }
 }

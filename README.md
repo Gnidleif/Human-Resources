@@ -51,14 +51,18 @@ General purpose Discord bot written in C#
 ### General
 
 * **s**ponge**b**ob !...string - Spongebobbify text input
+* **8b**all !...string - Ask a question, get an answer
 
 ### React - Make the bot react to certain phrases
 
 * **r**eact ulong - Get all or specific reactions  (**admin**)
-* **r**eact **a**dd !ulong !rgx !...phrase - Add bot guild reaction (**admin**)
-* **r**eact **p**hrase !ulong !...phrase - Append phrase to existing reaction (**admin**)
-* **r**eact **e**nable !ulong !bool - Enable or disable specific reaction (**admin**)
-* **r**eact **r**emove !rgx - Remove bot guild reaction (**admin**)
+* **r**eact **a**dd !ulong !rgx !...phrase - Add a new reaction (**admin**)
+* **r**eact **r**emove !ulong - Remove bot guild reaction (**admin**)
+* **r**eact **m**odify **a**dd !ulong !...phrase - Append phrase to existing reaction (**admin**)
+* **r**eact **m**odify **r**emove !ulong !uint - Removes phrase at index from reaction (**admin**)
+* **r**eact **m**odify **p**hrase !ulong !uint !...phrase - Modify phrase at index from reaction (**admin**)
+* **r**eact **m**odify **re**gex !ulong - Modify regex (**admin**)
+* **r**eact **m**odify **e**nable !ulong !bool - Enable or disable specific reaction (**admin**)
 
 ## Key
 
