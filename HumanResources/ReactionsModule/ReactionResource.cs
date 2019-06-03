@@ -1,4 +1,5 @@
 ﻿using HumanResources.Utilities;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -28,7 +29,7 @@ namespace HumanResources.ReactionsModule
       return this.Save();
     }
 
-    public bool Contains(ulong gid, ulong hash) => this.List.ContainsKey(gid) && this.List[gid].ContainsKey(hash);
+    public bool Contains(ulong gid, ulong id) => this.List.ContainsKey(gid) && this.List[gid].ContainsKey(id);
 
     public async Task Initialize()
     {
@@ -44,44 +45,67 @@ namespace HumanResources.ReactionsModule
       await Task.CompletedTask;
     }
 
-    public bool Pop(ulong gid, ulong hash)
+    public bool Pop(ulong gid, ulong id)
     {
-      if (this.Contains(gid, hash))
+      if (this.Contains(gid, id))
       {
-        return this.List[gid].Remove(hash);
+        return this.List[gid].Remove(id);
       }
       return false;
     }
 
     public bool Pop(ulong gid) => this.List.Remove(gid);
 
-    public bool Push(ulong gid, ulong hash)
+    public bool Push(ulong gid, ulong id)
     {
+      if (id == default)
+      {
+        return false;
+      }
       if (!this.List.ContainsKey(gid))
       {
         this.List.Add(gid, new Dictionary<ulong, ReactionHelper>());
       }
-      if (!this.List[gid].ContainsKey(hash))
+      if (!this.List[gid].ContainsKey(id))
       {
-        this.List[gid].Add(hash, null);
+        this.List[gid].Add(id, null);
         return true;
       }
       return false;
     }
 
-    public bool Push(ulong gid, Regex rgx, string p)
+    public bool Push(ulong gid, ulong id, Regex rgx, string p)
     {
-      var hash = (ulong)rgx.ToString().GetHashCode();
-      if (!this.Push(gid, hash))
+      if (string.IsNullOrWhiteSpace(p) || !this.Push(gid, id))
       {
         return false;
       }
-      this.List[gid][hash] = new ReactionHelper
+      this.List[gid][id] = new ReactionHelper
       {
         Rgx = rgx,
-        Phrase = p,
+        Phrases = new List<string>() { p },
       };
       return true;
+    }
+
+    public bool Append(ulong gid, ulong id, string p)
+    {
+      if (!string.IsNullOrWhiteSpace(p) && this.Contains(gid, id))
+      {
+        this.List[gid][id].Phrases.Add(p);
+        return true;
+      }
+      return false;
+    }
+
+    public bool Enable(ulong gid, ulong id, bool state)
+    {
+      if (this.Contains(gid, id))
+      {
+        this.List[gid][id].Enabled = state;
+        return true;
+      }
+      return false;
     }
 
     public bool Save() => JsonUtil.TryWrite(this.Path, this.List);
@@ -95,20 +119,29 @@ namespace HumanResources.ReactionsModule
       }
       foreach(var obj in this.List[gid].Values)
       {
-        if (obj.Rgx.IsMatch(words))
+        if (obj.Enabled && obj.Rgx.IsMatch(words))
         {
-          result.Add(obj.Phrase);
+          result.Add(obj.GetRandom(new Random(DateTime.UtcNow.Millisecond)));
         }
       }
       return result;
     }
 
-    public List<ReactionHelper> GetGuild(ulong gid) => this.List[gid]?.Values.ToList();
+    public string ToJson(ulong gid, ulong id)
+    {
+      if (id == default)
+      {
+        return JsonConvert.SerializeObject(this.List[gid], Formatting.Indented);
+      }
+      return this.Contains(gid, id) ? JsonConvert.SerializeObject(this.List[gid][id], Formatting.Indented) : string.Empty;
+    }
   }
 
   public class ReactionHelper
   {
     public Regex Rgx { get; set; }
-    public string Phrase { get; set; }
+    public List<string> Phrases { get; set; }
+    public bool Enabled { get; set; }
+    public string GetRandom(Random rand) => this.Phrases[rand.Next(0, this.Phrases.Count)];
   }
 }

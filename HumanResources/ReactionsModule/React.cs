@@ -14,42 +14,67 @@ namespace HumanResources.ReactionsModule
   public class React : ModuleBase<SocketCommandContext>
   {
     [Command, Summary("Retrieve regex and phrases for available reactions")]
-    public async Task GetReactions()
+    public async Task GetReactions(ulong id = default)
     {
-      var l = ReactionResource.Instance.GetGuild(Context.Guild.Id);
-      var sb = new StringBuilder();
-      foreach(var rh in l)
+      var json = ReactionResource.Instance.ToJson(Context.Guild.Id, id);
+      if (string.IsNullOrEmpty(json))
       {
-        sb.AppendLine($"{rh.Rgx.ToString()}: {rh.Phrase}");
+        await Context.User.SendMessageAsync($"No results found");
+        return;
       }
       var embed = new EmbedBuilder();
       var user = Context.User as SocketGuildUser;
       embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
-      embed.WithDescription(sb.ToString());
+      embed.WithDescription($"```json\n{json}\n```");
       embed.WithFooter(LogUtil.LogTime);
       await ReplyAsync("", false, embed.Build());
     }
 
     [Command("add"), Alias("a"), Summary("Add a reaction to the guild")]
-    public async Task AddReaction(Regex rgx, [Remainder] string phrase)
+    public async Task AddReaction(ulong id, Regex rgx, [Remainder] string phrase)
     {
-      if (ReactionResource.Instance.Push(Context.Guild.Id, rgx, phrase))
+      if (ReactionResource.Instance.Push(Context.Guild.Id, id, rgx, phrase))
       {
-        await ReplyAsync($":white_check_mark: Successfully added '{rgx}'");
+        await ReplyAsync($":white_check_mark: Successfully added '{id}'");
       }
       else
       {
-        await Context.User.SendMessageAsync($"Unable to add duplicate of '{rgx}'");
+        await Context.User.SendMessageAsync($"Unable to add duplicate of '{id}'");
+      }
+    }
+
+    [Command("phrase"), Alias("p"), Summary("Add a phrase to already existing ID")]
+    public async Task AddPhrase(ulong id, [Remainder] string phrase)
+    {
+      if (ReactionResource.Instance.Append(Context.Guild.Id, id, phrase))
+      {
+        await ReplyAsync($":white_check_mark: Successfully appended phrase to '{id}'");
+      }
+      else
+      {
+        await Context.User.SendMessageAsync($"Unable to find ID '{id}'");
+      }
+    }
+
+    [Command("disable"), Alias("d"), Summary("Enable a reaction")]
+    public async Task EnableReact(ulong id, bool state)
+    {
+      if (ReactionResource.Instance.Enable(Context.Guild.Id, id, state))
+      {
+        await ReplyAsync(":white_check_mark: Successfully " + (state ? "enabled" : "disabled") + $" ID '{id}'");
       }
     }
 
     [Command("remove"), Alias("r"), Summary("Remove reaction")]
-    public async Task RemoveReaction(string key)
+    public async Task RemoveReaction(ulong id)
     {
-      ulong hash = (ulong)key.GetHashCode();
-      if (ReactionResource.Instance.Pop(Context.Guild.Id, hash))
+      if (ReactionResource.Instance.Pop(Context.Guild.Id, id))
       {
-        await ReplyAsync($":white_check_mark: Successfully removed '{key}'");
+        await ReplyAsync($":white_check_mark: Successfully removed '{id}'");
+      }
+      else
+      {
+        await Context.User.SendMessageAsync($"Unable to find ID '{id}'");
       }
     }
   }

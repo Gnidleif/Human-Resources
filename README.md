@@ -54,8 +54,10 @@ General purpose Discord bot written in C#
 
 ### React - Make the bot react to certain phrases
 
-* **r**eact - Get list of reactions for the current guild  (**admin**)
-* **r**eact **a**dd !rgx !...string - Add bot guild reaction (**admin**)
+* **r**eact ulong - Get all or specific reactions  (**admin**)
+* **r**eact **a**dd !ulong !rgx !...phrase - Add bot guild reaction (**admin**)
+* **r**eact **p**hrase !ulong !...phrase - Append phrase to existing reaction (**admin**)
+* **r**eact **e**nable !ulong !bool - Enable or disable specific reaction (**admin**)
 * **r**eact **r**emove !rgx - Remove bot guild reaction (**admin**)
 
 ## Key
