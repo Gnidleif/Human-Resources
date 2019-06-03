@@ -2,8 +2,6 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using HumanResources.Utilities;
-using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
