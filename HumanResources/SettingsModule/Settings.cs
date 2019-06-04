@@ -135,6 +135,7 @@ namespace HumanResources.Settings
         embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl());
         embed.AddField("Step", $"**{cfg.Step}**", true);
         embed.AddField("Count", $"**{cfg.Count}**", true);
+        embed.AddField("Source", $"**{cfg.Source}**", true);
         embed.WithFooter(LogUtil.LogTime);
 
         await ReplyAsync("", false, embed.Build());
@@ -165,6 +166,20 @@ namespace HumanResources.Settings
         {
           Config.Bot.Guilds[Context.Guild.Id].Markov.Count = count;
           await ReplyAsync($":white_check_mark: Successfully set markov count to: {count}");
+        }
+      }
+
+      [Command("source"), Alias("so"), Summary("Set markov source count")]
+      public async Task SetSource(uint source)
+      {
+        if (source < 50 || source > 5000)
+        {
+          await ReplyAsync($":negative_squared_cross_mark: Allowed markov source range: 50-5000");
+        }
+        else
+        {
+          Config.Bot.Guilds[Context.Guild.Id].Markov.Source = source;
+          await ReplyAsync($":white_check_mark: Successfully set markov source count to: {source}");
         }
       }
     }

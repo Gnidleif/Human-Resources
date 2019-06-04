@@ -63,7 +63,7 @@ namespace HumanResources
       if (msg.HasMentionPrefix(Global.Client.CurrentUser, ref argPos))
       {
         var markov = Config.Bot.Guilds[ctx.Guild.Id].Markov;
-        await MarkovTalk(ctx, (int)markov.Step, (int)markov.Count);
+        await MarkovTalk(ctx, (int)markov.Source, (int)markov.Step, (int)markov.Count);
       }
       else if (msg.HasCharPrefix(prefix, ref argPos))
       {
@@ -76,9 +76,9 @@ namespace HumanResources
       }
     }
 
-    private async Task MarkovTalk(SocketCommandContext ctx, int step, int wordCount)
+    private async Task MarkovTalk(SocketCommandContext ctx, int source, int step, int wordCount)
     {
-      var messages = await ctx.Channel.GetMessagesAsync(500).FlattenAsync();
+      var messages = await ctx.Channel.GetMessagesAsync(source).FlattenAsync();
       if (!messages.Any())
       {
         return;

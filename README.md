@@ -12,6 +12,10 @@ General purpose Discord bot written in C#
   * Time - 10
   * Rank - First
   * Message - Welcome! You'll gain full privileges soon.
+* Markov
+  * Step - 3
+  * Count - 20
+  * Source - 500
 
 ## Features
 
@@ -27,6 +31,9 @@ General purpose Discord bot written in C#
 * **s**ettings **w**elcome **t**ime !ulong - Set the guild welcome time (**admin**)
 * **s**ettings **w**elcome **r**ole !string/ulong - Set the first role of new users (**admin**)
 * **s**ettings **w**elcome **m**essage !...string - Set the new guild welcome message (**admin**)
+* **s**ettings **m**arkov - Get markov settings
+* **s**ettings **m**arkov **s**tep !uint - Set markov step value
+* **s**ettings **m**arkov **c**ount !uint - Set markov word count value
 
 ### Administration - Standard administrative guild functions
 
