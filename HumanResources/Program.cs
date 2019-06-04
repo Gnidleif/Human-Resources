@@ -134,7 +134,7 @@ namespace HumanResources
       foreach(var r in this.Resources)
       {
         await r.Initialize();
-        _ = r.Save();
+        _ = r.Close();
       }
 
       Global.Client.LatencyUpdated += Client_LatencyUpdated;

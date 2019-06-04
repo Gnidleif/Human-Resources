@@ -66,12 +66,11 @@ namespace HumanResources.TwitterModule
       }
     }
 
-    // deactivated until fixed
-    [Group("stalk")]
-    [RequireUserPermission(GuildPermission.Administrator)]
+    //[Group("stalk")]
+    //[RequireUserPermission(GuildPermission.Administrator)]
     private class Stalk : ModuleBase<SocketCommandContext>
     {
-      [Command, Summary("Start outputting any tweets a specified user does in the given channel")]
+      //[Command, Summary("Start outputting any tweets a specified user does in the given channel")]
       public async Task StalkUser(string identifier, IMessageChannel ch)
       {
         var user = await TwitterResource.Instance.GetUserAsync(identifier);
@@ -85,7 +84,7 @@ namespace HumanResources.TwitterModule
         }
       }
 
-      [Command("list"), Summary("Return list of stalked users")]
+      //[Command("list"), Summary("Return list of stalked users")]
       public async Task StalkList()
       {
         var any = false;

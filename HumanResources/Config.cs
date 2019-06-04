@@ -53,6 +53,7 @@ namespace HumanResources
     public char Mark { get; set; } = '⭐';
     public bool MarkList { get; set; } = false;
     public WelcomeConfig Welcome { get; set; } = new WelcomeConfig();
+    public MarkovConfig Markov { get; set; } = new MarkovConfig();
   }
 
   public class WelcomeConfig
@@ -65,5 +66,11 @@ namespace HumanResources
     {
       this.Message = "Welcome! You'll gain full privileges soon.";
     }
+  }
+
+  public class MarkovConfig
+  {
+    public uint Step { get; set; } = 3;
+    public uint Count { get; set; } = 20;
   }
 }

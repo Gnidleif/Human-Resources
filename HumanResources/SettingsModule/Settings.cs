@@ -122,5 +122,51 @@ namespace HumanResources.Settings
         }
       }
     }
+
+    [Group("markov"), Alias("m")]
+    public class Markov : ModuleBase<SocketCommandContext>
+    {
+      [Command, Summary("Retrieve markov settings for guild")]
+      public async Task GetMarkov()
+      {
+        var cfg = Config.Bot.Guilds[Context.Guild.Id].Markov;
+        var user = Context.User as SocketGuildUser;
+        var embed = new EmbedBuilder();
+        embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl());
+        embed.AddField("Step", $"**{cfg.Step}**", true);
+        embed.AddField("Count", $"**{cfg.Count}**", true);
+        embed.WithFooter(LogUtil.LogTime);
+
+        await ReplyAsync("", false, embed.Build());
+      }
+
+      [Command("step"), Alias("s"), Summary("Set markov step count")]
+      public async Task SetStep(uint step)
+      {
+        if (step < 1 || step > 15)
+        {
+          await ReplyAsync($":negative_squared_cross_mark: Allowed markov step range: 1-15");
+        }
+        else
+        {
+          Config.Bot.Guilds[Context.Guild.Id].Markov.Step = step;
+          await ReplyAsync($":white_check_mark: Successfully set markov step to: {step}");
+        }
+      }
+
+      [Command("count"), Alias("c"), Summary("Set markov word count")]
+      public async Task SetCount(uint count)
+      {
+        if (count < 5 || count > 50)
+        {
+          await ReplyAsync($":negative_squared_cross_mark: Allowed markov count range: 5-50");
+        }
+        else
+        {
+          Config.Bot.Guilds[Context.Guild.Id].Markov.Count = count;
+          await ReplyAsync($":white_check_mark: Successfully set markov count to: {count}");
+        }
+      }
+    }
   }
 }
