@@ -27,11 +27,17 @@ General purpose Discord bot written in C#
 * **s**ettings **p**refi**x** !char - Set command prefix for the guild (**admin**)
 * **s**ettings **m**ar**k** !char - Set mark for the guild (**admin**)
 * **s**ettings **m**ark**l**ist !bool - Set if marked members are also blacklisted (**admin**)
+
+### Welcome settings - Get and set guild settings related to the welcome functionality
+
 * **s**ettings **w**elcome - Returns all the welcome settings for the guild
 * **s**ettings **w**elcome **e**nable !bool - Enable or disable guild welcome functionality (**admin**)
 * **s**ettings **w**elcome **t**ime !ulong - Set the guild welcome time (**admin**)
 * **s**ettings **w**elcome **r**ole !string/ulong - Set the first role of new users (**admin**)
 * **s**ettings **w**elcome **m**essage !...string - Set the new guild welcome message (**admin**)
+
+### Markov settings - Get and set guild settings related to the markov chain functionality
+
 * **s**ettings **m**arkov - Get markov settings 
 * **s**ettings **m**arkov **s**tep !uint - Set markov step value (**admin**)
 * **s**ettings **m**arkov **c**ount !uint - Set markov word count (**admin**)

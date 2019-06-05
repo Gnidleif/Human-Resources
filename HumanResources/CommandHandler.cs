@@ -70,10 +70,12 @@ namespace HumanResources
           await ctx.User.SendMessageAsync(result.ErrorReason);
         }
       }
-      else if (new Random(DateTime.UtcNow.Millisecond).Next(0, 100) <= settings.Markov.Chance)
+      else if (new Random(DateTime.UtcNow.Millisecond).Next(1, 100 + 1) <= settings.Markov.Chance)
       {
-        _ = ctx.Channel.TriggerTypingAsync();
-        await MarkovTalk(ctx, (int)settings.Markov.Source, (int)settings.Markov.Step, (int)settings.Markov.Count);
+        using (ctx.Channel.EnterTypingState())
+        {
+          await MarkovTalk(ctx, (int)settings.Markov.Source, (int)settings.Markov.Step, (int)settings.Markov.Count);
+        }
       }
     }
 
@@ -84,7 +86,7 @@ namespace HumanResources
       {
         return;
       }
-      var control = @"[\W]+";
+      var control = @"[!?.,:;()[]]+";
       var prefix = $"^{Config.Bot.Guilds[ctx.Guild.Id].Prefix}\\w+";
       var filter = @"(?m)(<(@[!&]?|[#]|a?:\w+:)\d+>)|(\bhttps://.+\b)";
       var filtered = new List<string>();
@@ -130,16 +132,16 @@ namespace HumanResources
           chain[k].Add(v);
         }
       }
+      if (!chain.Any())
+      {
+        return;
+      }
       var rand = new Random(DateTime.UtcNow.Millisecond);
       var result = new StringBuilder();
       var temp = new List<string>
       {
         chain.ElementAt(rand.Next(0, chain.Count)).Key,
       };
-      while(Regex.IsMatch(temp[0], control))
-      {
-        temp[0] = chain.ElementAt(rand.Next(0, chain.Count)).Key;
-      }
       for(int i = 0; i < wordCount; i++)
       {
         var key = string.Join(" ", temp.Skip(i).Take(step));
@@ -148,6 +150,11 @@ namespace HumanResources
           key = chain.ElementAt(rand.Next(0, chain.Count)).Key;
         }
         var value = chain[key].ElementAt(rand.Next(0, chain[key].Count));
+        while(result.Length == 0 && Regex.IsMatch(value, control))
+        {
+          key = chain.ElementAt(rand.Next(0, chain.Count)).Key;
+          value = chain[key].ElementAt(rand.Next(0, chain[key].Count));
+        }
         temp.Add(value);
         result.Append(Regex.IsMatch(value, control) ? value : $" {value}");
       }

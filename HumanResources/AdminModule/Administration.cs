@@ -74,9 +74,9 @@ namespace HumanResources.AdminModule
       var messages = await Context.Channel.GetMessagesAsync(Context.Message.Id, Direction.Before, (int)count).FlattenAsync();
       var ch = Context.Channel as ITextChannel;
       await ch.DeleteMessagesAsync(messages);
-      var m = await ReplyAsync($":white_check_mark: Successfully removed {count} messages");
-      await Task.Delay(10000);
+      var m = await ReplyAsync($":white_check_mark: Successfully removed maximum {count} messages");
       await Context.Message.DeleteAsync();
+      await Task.Delay(5000);
       await m.DeleteAsync();
     }
     #endregion
