@@ -16,6 +16,7 @@ General purpose Discord bot written in C#
   * Step - 3
   * Count - 20
   * Source - 500
+  * Chance - 1
 
 ## Features
 
@@ -31,14 +32,17 @@ General purpose Discord bot written in C#
 * **s**ettings **w**elcome **t**ime !ulong - Set the guild welcome time (**admin**)
 * **s**ettings **w**elcome **r**ole !string/ulong - Set the first role of new users (**admin**)
 * **s**ettings **w**elcome **m**essage !...string - Set the new guild welcome message (**admin**)
-* **s**ettings **m**arkov - Get markov settings
-* **s**ettings **m**arkov **s**tep !uint - Set markov step value
-* **s**ettings **m**arkov **c**ount !uint - Set markov word count value
+* **s**ettings **m**arkov - Get markov settings 
+* **s**ettings **m**arkov **s**tep !uint - Set markov step value (**admin**)
+* **s**ettings **m**arkov **c**ount !uint - Set markov word count (**admin**)
+* **s**ettings **m**arkov **so**urce !uint - Set markov source count (**admin**)
+* **s**ettings **m**arkov **ch**ance !uint - Set markov trigger chance (**admin**)
 
 ### Administration - Standard administrative guild functions
 
 * **k**ick !string/ulong ...string - Kicks user (**kick**)
 * **b**an !string/ulong ...string - Bans user (**ban**)
+* **p**urge !uint - Remove specified amount of messages from channel (**admin**)
 * **v**oice **k**ick !string/ulong ...string - Voice kick user (**kick**)
 * **v**oice **m**ute !string/ulong ...string - Mute user (**mute**)
 * **v**oice **m**ute **r**emove !string/ulong - Removes mute from user (**mute**)

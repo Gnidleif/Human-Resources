@@ -65,6 +65,20 @@ namespace HumanResources.AdminModule
 
       await ReplyAsync("", false, embed.Build());
     }
+
+    [Command("purge"), Alias("p"), Summary("Removes specified amount of messages in given channel")]
+    [RequireBotPermission(GuildPermission.ManageMessages)]
+    [RequireUserPermission(GuildPermission.Administrator)]
+    public async Task PurgeChannel(uint count = 1)
+    {
+      var messages = await Context.Channel.GetMessagesAsync(Context.Message.Id, Direction.Before, (int)count).FlattenAsync();
+      var ch = Context.Channel as ITextChannel;
+      await ch.DeleteMessagesAsync(messages);
+      var m = await ReplyAsync($":white_check_mark: Successfully removed {count} messages");
+      await Task.Delay(10000);
+      await Context.Message.DeleteAsync();
+      await m.DeleteAsync();
+    }
     #endregion
 
     #region Voice

@@ -109,6 +109,7 @@ namespace HumanResources.Settings
       }
 
       [Command("message"), Alias("m"), Summary("Set the welcome message")]
+      [RequireUserPermission(GuildPermission.Administrator)]
       public async Task SetMessage([Summary("The new welcome message, leave empty to disable functionality")] [Remainder] string msg = "")
       {
         Config.Bot.Guilds[Context.Guild.Id].Welcome.Message = msg;
@@ -136,12 +137,14 @@ namespace HumanResources.Settings
         embed.AddField("Step", $"**{cfg.Step}**", true);
         embed.AddField("Count", $"**{cfg.Count}**", true);
         embed.AddField("Source", $"**{cfg.Source}**", true);
+        embed.AddField("Chance", $"**{cfg.Chance}%**", true);
         embed.WithFooter(LogUtil.LogTime);
 
         await ReplyAsync("", false, embed.Build());
       }
 
       [Command("step"), Alias("s"), Summary("Set markov step count")]
+      [RequireUserPermission(GuildPermission.Administrator)]
       public async Task SetStep(uint step)
       {
         if (step < 1 || step > 15)
@@ -156,6 +159,7 @@ namespace HumanResources.Settings
       }
 
       [Command("count"), Alias("c"), Summary("Set markov word count")]
+      [RequireUserPermission(GuildPermission.Administrator)]
       public async Task SetCount(uint count)
       {
         if (count < 5 || count > 50)
@@ -170,6 +174,7 @@ namespace HumanResources.Settings
       }
 
       [Command("source"), Alias("so"), Summary("Set markov source count")]
+      [RequireUserPermission(GuildPermission.Administrator)]
       public async Task SetSource(uint source)
       {
         if (source < 50 || source > 5000)
@@ -181,6 +186,18 @@ namespace HumanResources.Settings
           Config.Bot.Guilds[Context.Guild.Id].Markov.Source = source;
           await ReplyAsync($":white_check_mark: Successfully set markov source count to: {source}");
         }
+      }
+
+      [Command("chance"), Alias("ch"), Summary("Set markov trigger chance")]
+      [RequireUserPermission(GuildPermission.Administrator)]
+      public async Task SetChance(uint chance)
+      {
+        if (chance > 100)
+        {
+          chance = 100;
+        }
+        Config.Bot.Guilds[Context.Guild.Id].Markov.Chance = chance;
+        await ReplyAsync($":white_check_mark: Successfully set markov trigger chance to: {chance}%");
       }
     }
   }

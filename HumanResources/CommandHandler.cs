@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -59,13 +60,8 @@ namespace HumanResources
       }
 
       int argPos = 0;
-      char prefix = Config.Bot.Guilds[ctx.Guild.Id].Prefix;
-      if (msg.HasMentionPrefix(Global.Client.CurrentUser, ref argPos))
-      {
-        var markov = Config.Bot.Guilds[ctx.Guild.Id].Markov;
-        await MarkovTalk(ctx, (int)markov.Source, (int)markov.Step, (int)markov.Count);
-      }
-      else if (msg.HasCharPrefix(prefix, ref argPos))
+      var settings = Config.Bot.Guilds[ctx.Guild.Id];
+      if (msg.HasCharPrefix(settings.Prefix, ref argPos) || msg.HasMentionPrefix(Global.Client.CurrentUser, ref argPos))
       {
         var result = await this.Service.ExecuteAsync(ctx, argPos, null);
         if (!result.IsSuccess && result.Error != CommandError.UnknownCommand)
@@ -73,6 +69,11 @@ namespace HumanResources
           LogUtil.Write("Client_MessageReceived", $"Message: {msg.Content} | Error: {result.ErrorReason}");
           await ctx.User.SendMessageAsync(result.ErrorReason);
         }
+      }
+      else if (new Random(DateTime.UtcNow.Millisecond).Next(0, 100) <= settings.Markov.Chance)
+      {
+        _ = ctx.Channel.TriggerTypingAsync();
+        await MarkovTalk(ctx, (int)settings.Markov.Source, (int)settings.Markov.Step, (int)settings.Markov.Count);
       }
     }
 
@@ -83,17 +84,23 @@ namespace HumanResources
       {
         return;
       }
-      var prefixPattern = $"^{Config.Bot.Guilds[ctx.Guild.Id].Prefix}\\w+";
-      var pattern = @"(?m)(<(@[!&]?|[#]|a?:\w+:)\d+>)|(\bhttps://.+\b)";
+      var control = @"[\W]+";
+      var prefix = $"^{Config.Bot.Guilds[ctx.Guild.Id].Prefix}\\w+";
+      var filter = @"(?m)(<(@[!&]?|[#]|a?:\w+:)\d+>)|(\bhttps://.+\b)";
       var filtered = new List<string>();
-      foreach (var msg in messages.Where(x => !Regex.IsMatch(x.Content, prefixPattern) && !x.Author.IsBot))
+      foreach (var msg in messages.Where(x => !Regex.IsMatch(x.Content, prefix) && !x.Author.IsBot))
       {
-        var rep = Regex.Replace(msg.Content, pattern, "");
+        var rep = Regex.Replace(msg.Content, filter, "");
         if (string.IsNullOrEmpty(rep))
         {
           continue;
         }
-        var split = Regex.Split(rep, @"\s+");
+        var sb = new StringBuilder();
+        foreach(var s in rep.Select(x => x.ToString()))
+        {
+          sb.Append(Regex.IsMatch(s, control) ? $" {s} " : s);
+        }
+        var split = Regex.Split(sb.ToString(), @"\s+");
         if (!split.Any())
         {
           continue;
@@ -110,10 +117,10 @@ namespace HumanResources
         return;
       }
       var chain = new Dictionary<string, List<string>>();
-      for (var i = 0; i < filtered.Count - step; i += step)
+      for (var i = 0; i < filtered.Count - step; i++)
       {
-        var k = filtered[i].ToLower();
-        var v = string.Join(" ", filtered.Skip(i + 1).Take(step)).ToLower();
+        var k = string.Join(" ", filtered.Skip(i).Take(step)).ToLower();
+        var v = filtered[i + step].ToLower();
         if (!chain.ContainsKey(k))
         {
           chain.Add(k, new List<string> { v });
@@ -124,15 +131,27 @@ namespace HumanResources
         }
       }
       var rand = new Random(DateTime.UtcNow.Millisecond);
-      var result = new List<string>();
-      var key = chain.ElementAt(rand.Next(0, chain.Count)).Key;
-      while (result.Count < (wordCount / step))
+      var result = new StringBuilder();
+      var temp = new List<string>
       {
-        var value = chain[key][rand.Next(0, chain[key].Count)];
-        key = chain.ContainsKey(value) ? value : chain.ElementAt(rand.Next(0, chain.Count)).Key;
-        result.Add(value);
+        chain.ElementAt(rand.Next(0, chain.Count)).Key,
+      };
+      while(Regex.IsMatch(temp[0], control))
+      {
+        temp[0] = chain.ElementAt(rand.Next(0, chain.Count)).Key;
       }
-      await ctx.Channel.SendMessageAsync(string.Join(" ", result));
+      for(int i = 0; i < wordCount; i++)
+      {
+        var key = string.Join(" ", temp.Skip(i).Take(step));
+        if (!chain.ContainsKey(key))
+        {
+          key = chain.ElementAt(rand.Next(0, chain.Count)).Key;
+        }
+        var value = chain[key].ElementAt(rand.Next(0, chain[key].Count));
+        temp.Add(value);
+        result.Append(Regex.IsMatch(value, control) ? value : $" {value}");
+      }
+      await ctx.Channel.SendMessageAsync(result.ToString());
     }
   }
 }
