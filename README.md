@@ -1,6 +1,22 @@
 # Human Resources
 
-General purpose Discord bot written in C#
+General purpose Discord bot with a focus on administrative functionality written in C#. To get this bot working at it's best it's recommended to set it as guild administrator. 
+
+## Timeout
+
+To get the timeout functionality to work properly it's advisable to remove the ability for people with **only** the @everybody role to be unable to speak. The reason for this is that the timeout command removes any roles except the @everybody role.
+
+## Mark
+
+This functionality is used to mark users that deserve to be punished somehow. Any marked users are unable to remove the mark from their name and, if the configuration is set properly, won't be able to use the bot.
+
+## Welcome
+
+If this functionality is enabled new members are greeted with a message and will have to wait for a specified amount of time before being upgraded to the config specific guild rank. It's recommended to make members with **only** the @everybody role unable to chat and join voice channels in order for this to work properly.
+
+## Markov chain
+
+The markov chain functionality randomly outputs a message of a specific length whenever a non-command line is written in a channel. It uses filtered previously written messages in the channel where it triggers to generate the message. Source is by default set to 500 since messages can only be retrieved at a rate of 100/request and a request takes ~1 second.
 
 ## Default guild settings
 
@@ -13,10 +29,10 @@ General purpose Discord bot written in C#
   * Rank - First
   * Message - Welcome! You'll gain full privileges soon.
 * Markov
-  * Step - 3
+  * Step - 1
   * Count - 20
   * Source - 500
-  * Chance - 1
+  * Chance - 5
 
 ## Features
 
@@ -28,7 +44,7 @@ General purpose Discord bot written in C#
 * **s**ettings **m**ar**k** !char - Set mark for the guild (**admin**)
 * **s**ettings **m**ark**l**ist !bool - Set if marked members are also blacklisted (**admin**)
 
-### Welcome settings - Get and set guild settings related to the welcome functionality
+#### Welcome settings - Get and set guild settings related to the welcome functionality
 
 * **s**ettings **w**elcome - Returns all the welcome settings for the guild
 * **s**ettings **w**elcome **e**nable !bool - Enable or disable guild welcome functionality (**admin**)
@@ -36,7 +52,7 @@ General purpose Discord bot written in C#
 * **s**ettings **w**elcome **r**ole !string/ulong - Set the first role of new users (**admin**)
 * **s**ettings **w**elcome **m**essage !...string - Set the new guild welcome message (**admin**)
 
-### Markov settings - Get and set guild settings related to the markov chain functionality
+#### Markov settings - Get and set guild settings related to the markov chain functionality
 
 * **s**ettings **m**arkov - Get markov settings 
 * **s**ettings **m**arkov **s**tep !uint - Set markov step value (**admin**)

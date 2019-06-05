@@ -61,18 +61,14 @@ namespace HumanResources
     public bool Enabled { get; set; } = false;
     public uint Time { get; set; } = 10;
     public int Rank { get; set; } = 1;
-    public string Message { get; set; }
-    public WelcomeConfig()
-    {
-      this.Message = "Welcome! You'll gain full privileges soon.";
-    }
+    public string Message { get; set; } = "Welcome! You'll gain full privileges soon.";
   }
 
   public class MarkovConfig
   {
-    public uint Step { get; set; } = 3;
+    public uint Step { get; set; } = 1;
     public uint Count { get; set; } = 20;
     public uint Source { get; set; } = 500;
-    public uint Chance { get; set; } = 1;
+    public uint Chance { get; set; } = 5;
   }
 }
