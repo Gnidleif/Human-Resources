@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -14,15 +15,17 @@ namespace HumanResources.TextModule
     [Command("spongebob"), Alias("sb"), Summary("Spongebobbify text")]
     public async Task Spongebob([Remainder] string text)
     {
-      var result = text.Select(c => new Random(DateTime.UtcNow.Millisecond).Next(0, 2) == 0 
-        ? c.ToString().ToLower() 
-        : c.ToString().ToUpper())
-        .ToList();
+      var rand = new Random(DateTime.UtcNow.Millisecond);
+      var result = new StringBuilder();
+      foreach(var s in text.Select(x => x.ToString()))
+      {
+        result.Append(rand.Next(0, 1+1) > 0 ? s.ToLower() : s.ToUpper());
+      }
       var user = Context.User as SocketGuildUser;
       var embed = new EmbedBuilder();
       embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
       embed.WithColor(247, 235, 98);
-      embed.WithDescription(string.Join("", result));
+      embed.WithDescription(string.Join("", result.ToString()));
       await ReplyAsync("", false, embed.Build());
     }
 
