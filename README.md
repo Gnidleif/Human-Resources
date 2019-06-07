@@ -16,7 +16,7 @@ If this functionality is enabled new members are greeted with a message and will
 
 ## Markov chain
 
-The markov chain functionality randomly outputs a message of a specific length whenever a non-command line is written in a channel. It uses filtered previously written messages in the channel where it triggers to generate the message. Source is by default set to 500 since messages can only be retrieved at a rate of 100/request and a request takes ~1 second.
+The markov chain functionality randomly outputs a message of a specific length whenever a non-command line is written in a channel. It uses filtered previously written messages in the channel where it triggers to generate the message. Source is by default set to 500 since messages can only be retrieved at a rate of 100/request and a request takes ~0.2 seconds.
 
 ## Default guild settings
 
