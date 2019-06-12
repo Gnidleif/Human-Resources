@@ -69,6 +69,6 @@ namespace HumanResources
     public uint Step { get; set; } = 1;
     public uint Count { get; set; } = 20;
     public uint Source { get; set; } = 500;
-    public uint Chance { get; set; } = 5;
+    public uint Chance { get; set; } = 0;
   }
 }

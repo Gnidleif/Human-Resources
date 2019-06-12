@@ -32,7 +32,7 @@ The markov chain functionality randomly outputs a message of a specific length w
   * Step - 1
   * Count - 20
   * Source - 500
-  * Chance - 5
+  * Chance - 0
 
 ## Features
 
