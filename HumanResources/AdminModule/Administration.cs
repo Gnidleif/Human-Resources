@@ -96,20 +96,15 @@ namespace HumanResources.AdminModule
           return;
         }
 
-        var temp = await Context.Guild.CreateVoiceChannelAsync(LogUtil.ToUnixTime().ToString());
         try
         {
-          await user.ModifyAsync(x => x.Channel = temp);
+          await user.ModifyAsync(x => x.Channel = null);
         }
         catch (Discord.Net.HttpException e)
         {
           LogUtil.Write("Voice:KickUser", e.Message);
           await Context.User.SendMessageAsync(e.Message);
           return;
-        }
-        finally
-        {
-          await temp.DeleteAsync();
         }
 
         var embed = new EmbedBuilder();
@@ -290,9 +285,7 @@ namespace HumanResources.AdminModule
           await TimeoutResource.Instance.SetTimeout(user, minutes);
           if (user.VoiceChannel != null)
           {
-            var temp = await Context.Guild.CreateVoiceChannelAsync(LogUtil.ToUnixTime().ToString());
-            await user.ModifyAsync(x => x.Channel = temp);
-            await temp.DeleteAsync();
+            await user.ModifyAsync(x => x.Channel = null);
           }
         }
         catch(Exception e)
@@ -326,6 +319,19 @@ namespace HumanResources.AdminModule
           LogUtil.Write("Timeout:UntimeoutUser", e.Message);
           await Context.User.SendMessageAsync($"Couldn't remove {user.Username} from timeout");
         }
+      }
+
+      [Command("setup"), Summary("Sets up the guild for timeout usage")]
+      [RequireBotPermission(GuildPermission.ManageRoles)]
+      public async Task Setup()
+      {
+        var everyone = Context.Guild.EveryoneRole;
+        await everyone.ModifyAsync(x => 
+        {
+          x.Mentionable = true;
+          x.Permissions = new GuildPermissions(true, false, false, false, false, false, false, false, true, false, false, false, false, false, true, false, false, false, false, false, false, false, true, false, true, false, false, false, false);
+        });
+        await Context.User.SendMessageAsync("Successfully set up the @everyone role to use the timeout functionality");
       }
     }
     #endregion

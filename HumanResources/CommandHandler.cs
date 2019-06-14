@@ -86,6 +86,26 @@ namespace HumanResources
       {
         return;
       }
+      var filtered = FilterMessages(ctx, messages);
+      if (!filtered.Any())
+      {
+        return;
+      }
+      var chain = MakeChain(filtered, step);
+      if (!chain.Any())
+      {
+        return;
+      }
+      var result = GenerateMessage(chain, step, wordCount);
+      if (string.IsNullOrEmpty(result))
+      {
+        return;
+      }
+      await ctx.Channel.SendMessageAsync(result);
+    }
+
+    private List<string> FilterMessages(SocketCommandContext ctx, IEnumerable<IMessage> messages)
+    {
       var control = @"[!?.,:;()[]]+";
       var prefix = $"^{Config.Bot.Guilds[ctx.Guild.Id].Prefix}\\w+";
       var filter = @"(?m)(<(@[!&]?|[#]|a?:\w+:)\d+>)|(\bhttps://.+\b)";
@@ -98,7 +118,7 @@ namespace HumanResources
           continue;
         }
         var sb = new StringBuilder();
-        foreach(var s in rep.Select(x => x.ToString()))
+        foreach (var s in rep.Select(x => x.ToString()))
         {
           sb.Append(Regex.IsMatch(s, control) ? $" {s} " : s);
         }
@@ -114,10 +134,11 @@ namespace HumanResources
         }
         filtered.AddRange(noEmpty);
       }
-      if (!filtered.Any())
-      {
-        return;
-      }
+      return filtered;
+    }
+
+    private Dictionary<string, List<string>> MakeChain(List<string> filtered, int step)
+    {
       var chain = new Dictionary<string, List<string>>();
       for (var i = 0; i < filtered.Count - step; i++)
       {
@@ -132,17 +153,19 @@ namespace HumanResources
           chain[k].Add(v);
         }
       }
-      if (!chain.Any())
-      {
-        return;
-      }
+      return chain;
+    }
+
+    private string GenerateMessage(Dictionary<string, List<string>> chain, int step, int wordCount)
+    {
+      var control = @"[!?.,:;()[]]+";
       var rand = new Random(DateTime.UtcNow.Millisecond);
       var result = new StringBuilder();
       var temp = new List<string>
       {
         chain.ElementAt(rand.Next(0, chain.Count)).Key,
       };
-      for(int i = 0; i < wordCount; i++)
+      for (int i = 0; i < wordCount; i++)
       {
         var key = string.Join(" ", temp.Skip(i).Take(step));
         if (!chain.ContainsKey(key))
@@ -150,7 +173,7 @@ namespace HumanResources
           key = chain.ElementAt(rand.Next(0, chain.Count)).Key;
         }
         var value = chain[key].ElementAt(rand.Next(0, chain[key].Count));
-        while(result.Length == 0 && Regex.IsMatch(value, control))
+        while (result.Length == 0 && Regex.IsMatch(value, control))
         {
           key = chain.ElementAt(rand.Next(0, chain.Count)).Key;
           value = chain[key].ElementAt(rand.Next(0, chain[key].Count));
@@ -158,7 +181,7 @@ namespace HumanResources
         temp.Add(value);
         result.Append(Regex.IsMatch(value, control) ? value : $" {value}");
       }
-      await ctx.Channel.SendMessageAsync(result.ToString());
+      return result.ToString();
     }
   }
 }

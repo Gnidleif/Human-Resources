@@ -28,6 +28,7 @@ namespace HumanResources
       Global.Client = new DiscordSocketClient(new DiscordSocketConfig
       {
         LogLevel = LogSeverity.Verbose,
+        ExclusiveBulkDelete = true,
       });
 
       Global.Client.UserJoined += Client_UserJoined;

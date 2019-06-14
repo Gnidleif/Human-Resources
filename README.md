@@ -74,6 +74,7 @@ The markov chain functionality randomly outputs a message of a specific length w
 * **bl**acklist **r**emove !string/ulong - Removes user from blacklist (**admin**)
 * **t**ime**o**ut !string/ulong uint=10, ...string - Set user on timeout, set time to 0 for random 10-5000 (**admin**)
 * **t**ime**o**ut **r**emove !string/ulong - Removes user from timeout (**admin**)
+* **t**ime**o**ut **setup** - Sets up the @everyone role for timeout usage (**admin**)
 * **m**ar**k** !string/ulong ...string - Set guild mark on user (**admin**)
 * **m**ar**k** **r**emove !string/ulong - Remove guild mark from user (**admin**)
 
