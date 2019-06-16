@@ -1,28 +1,28 @@
 ﻿using HumanResources.Utilities;
 using System;
-using System.Collections.Generic;
 using System.Text;
+using Tweetinvi.Models;
 
 namespace HumanResources.TwitterModule
 {
   public static class TwitterUserExtensions
   {
-    public static double DaysAlive(this LinqToTwitter.User user)
+    public static double DaysAlive(this IUser user)
     {
       return (DateTime.Now - user.CreatedAt).TotalDays;
     }
 
-    public static double FavsPerDay(this LinqToTwitter.User user)
+    public static double FavsPerDay(this IUser user)
     {
-      return user.FavoritesCount / user.DaysAlive();
+      return user.FavouritesCount / user.DaysAlive();
     }
 
-    public static double TweetsPerDay(this LinqToTwitter.User user)
+    public static double TweetsPerDay(this IUser user)
     {
       return user.StatusesCount / user.DaysAlive();
     }
 
-    public static double Ratio(this LinqToTwitter.User user)
+    public static double Ratio(this IUser user)
     {
       if (user.FollowersCount == 0)
       {
@@ -35,7 +35,7 @@ namespace HumanResources.TwitterModule
       return (double)user.FollowersCount / user.FriendsCount;
     }
 
-    public static string FormattedAge(this LinqToTwitter.User user)
+    public static string FormattedAge(this IUser user)
     {
       var sb = new StringBuilder();
       var age = LogUtil.CalculateAge(user.CreatedAt);
@@ -43,7 +43,7 @@ namespace HumanResources.TwitterModule
       return sb.ToString();
     }
 
-    public static double Score(this LinqToTwitter.User user)
+    public static double Score(this IUser user)
     {
       var total = 0.0;
       double dayScore = Math.Pow(user.DaysAlive(), 1.05);
@@ -54,7 +54,7 @@ namespace HumanResources.TwitterModule
       {
         favAbs = 0.1;
       }
-      double favScore = user.FavoritesCount / 7 / Math.Sqrt(favAbs * 7);
+      double favScore = user.FavouritesCount / 7 / Math.Sqrt(favAbs * 7);
       total += favScore;
 
       double tweetAbs = Math.Abs(user.TweetsPerDay() - 5);

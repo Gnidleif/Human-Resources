@@ -2,7 +2,6 @@
 using Discord.Commands;
 using HumanResources.Utilities;
 using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace HumanResources.TwitterModule
@@ -13,11 +12,11 @@ namespace HumanResources.TwitterModule
     [Command, Summary("Retrieves a Twitter user specified by handle/id")]
     public async Task GetUser(string identifier, bool verbose = false)
     {
-      var user = await TwitterResource.Instance.GetUserAsync(identifier);
+      var user = TwitterResource.Instance.GetUser(identifier);
       if (user != null)
       {
         var embed = new EmbedBuilder();
-        embed.WithAuthor($"{user.Name} (@{user.ScreenNameResponse})", user.ProfileImageUrl, $"https://twitter.com/{user.ScreenNameResponse}");
+        embed.WithAuthor($"{user.Name} (@{user.ScreenName})", user.ProfileImageUrl, $"https://twitter.com/{user.ScreenName}");
         if (uint.TryParse(user.ProfileLinkColor.Replace("#", ""), NumberStyles.HexNumber, null, out uint rgb))
         {
           embed.WithColor(new Color(rgb));
@@ -41,7 +40,7 @@ namespace HumanResources.TwitterModule
 
           embed.AddField("Tweets", user.StatusesCount, true);
           embed.AddField("Per day", user.TweetsPerDay().ToString("0.00", CultureInfo.InvariantCulture), true);
-          embed.AddField("Last", user.Status != null ? $"[{LogUtil.FormattedDate(user.Status.CreatedAt)}](https://www.twitter.com/{user.ScreenNameResponse}/status/{user.Status.StatusID})" : "-", true);
+          embed.AddField("Last", user.Status != null ? $"[{LogUtil.FormattedDate(user.Status.CreatedAt)}](https://www.twitter.com/{user.ScreenName}/status/{user.Status.IdStr})" : "-", true);
 
           var defs = "-";
           if (user.DefaultProfile)
@@ -54,55 +53,60 @@ namespace HumanResources.TwitterModule
           }
           embed.AddField("Defaults", defs);
 
-          embed.AddField("Favorites", user.FavoritesCount, true);
+          embed.AddField("Favorites", user.FavouritesCount, true);
           embed.AddField("Per day", user.FavsPerDay().ToString("0.00", CultureInfo.InvariantCulture), true);
           embed.AddField("URL", !string.IsNullOrEmpty(user.Url) ? user.Url : "-", true);
         }
 
         embed.AddField("Score", (long)user.Score());
-        embed.WithFooter($"ID: {user.UserIDResponse}", TwitterResource.Instance.Icon);
+        embed.WithFooter($"ID: {user.IdStr}", TwitterResource.Instance.Icon);
 
         await ReplyAsync("", false, embed.Build());
       }
     }
 
-    //[Group("stalk")]
-    //[RequireUserPermission(GuildPermission.Administrator)]
-    private class Stalk : ModuleBase<SocketCommandContext>
+    [Group("follow"), Alias("f"), Summary("Functions related to following people on twitter")]
+    [RequireContext(ContextType.Guild)]
+    [RequireUserPermission(GuildPermission.Administrator)]
+    public class Follow : ModuleBase<SocketCommandContext>
     {
-      //[Command, Summary("Start outputting any tweets a specified user does in the given channel")]
-      public async Task StalkUser(string identifier, IMessageChannel ch)
+      [Command, Summary("Follow a specific Twitter account, outputting their tweets in the specified channel")]
+      public async Task FollowUser(string identifier, IChannel channel)
       {
-        var user = await TwitterResource.Instance.GetUserAsync(identifier);
-        if (user != null)
+        var user = TwitterResource.Instance.GetUser(identifier);
+        if (user == null)
         {
-          var id = ulong.Parse(user.UserIDResponse);
-          if (TwitterResource.Instance.Push(id, ch.Id))
-          {
-            await ReplyAsync($":white_check_mark: Started stalking {user.Name} (@{user.ScreenNameResponse})");
-          }
+          await Context.User.SendMessageAsync($":negative_squared_cross_mark: Couldn't find Twitter user with identifier {identifier}");
+          return;
+        }
+
+        if (TwitterResource.Instance.Push((ulong)user.Id, channel.Id))
+        {
+          await ReplyAsync($":white_check_mark: Successfully following {user.ScreenName} in <#{channel.Id}>");
+        }
+        else
+        {
+          await Context.User.SendMessageAsync($":negative_squared_cross_mark: Already following {user.ScreenName} in {channel}");
         }
       }
 
-      //[Command("list"), Summary("Return list of stalked users")]
-      public async Task StalkList()
+      [Command("remove"), Alias("r"), Summary("Stop following a user in a specific channel")]
+      public async Task UnfollowUser(string identifier, IChannel channel)
       {
-        var any = false;
-        var embed = new EmbedBuilder();
-        foreach(var c in Context.Guild.Channels)
+        var user = TwitterResource.Instance.GetUser(identifier);
+        if (user == null)
         {
-          var l = await TwitterResource.Instance.GetUsersByChannelIdAsync(c.Id);
-          if (l.Any())
-          {
-            embed.AddField($"#{c.Name}", string.Join(", ", l.Select(x => $"[{x.ScreenNameResponse}](https://www.twitter.com/{x.ScreenNameResponse})").ToList()));
-            any = true;
-          }
+          await Context.User.SendMessageAsync($":negative_squared_cross_mark: Couldn't find Twitter user with identifier {identifier}");
+          return;
         }
-        if (any)
+
+        if (TwitterResource.Instance.Pop((ulong)user.Id, channel.Id))
         {
-          embed.WithColor(56, 161, 243);
-          embed.WithFooter(LogUtil.LogTime, TwitterResource.Instance.Icon);
-          await ReplyAsync("", false, embed.Build());
+          await ReplyAsync($":white_check_mark: Successfully unfollowed {user.ScreenName} in <#{channel.Id}>");
+        }
+        else
+        {
+          await Context.User.SendMessageAsync($":negative_squared_cross_mark: Already not following {user.ScreenName} in {channel}");
         }
       }
     }

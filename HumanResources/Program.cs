@@ -8,6 +8,7 @@ using Discord.WebSocket;
 using Discord;
 using System.Linq;
 using HumanResources.ReactionsModule;
+using HumanResources.AnnounceModule;
 
 namespace HumanResources
 {
@@ -63,6 +64,7 @@ namespace HumanResources
         TimeoutResource.Instance,
         TwitterResource.Instance,
         ReactionResource.Instance,
+        AnnounceResource.Instance,
       };
       AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
 

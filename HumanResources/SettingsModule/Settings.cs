@@ -30,7 +30,7 @@ namespace HumanResources.Settings
 
     [Command("prefix"), Alias("px"), Summary("Set command prefix for the guild")]
     [RequireUserPermission(GuildPermission.Administrator)]
-    public async Task SetPrefix([Summary("The new prefix")] char prefix)
+    public async Task SetPrefix(char prefix)
     {
       Config.Bot.Guilds[Context.Guild.Id].Prefix = prefix;
       await ReplyAsync($":white_check_mark: Successfully set prefix to **{prefix}**");
@@ -38,7 +38,7 @@ namespace HumanResources.Settings
 
     [Command("mark"), Alias("mk"), Summary("Set mark for the guild")]
     [RequireUserPermission(GuildPermission.Administrator)]
-    public async Task SetMark([Summary("The new mark")] char mark)
+    public async Task SetMark(char mark)
     {
       Config.Bot.Guilds[Context.Guild.Id].Mark = mark;
       await ReplyAsync($":white_check_mark: Successfully set mark to **{mark}**");
@@ -47,7 +47,7 @@ namespace HumanResources.Settings
 
     [Command("marklist"), Alias("ml"), Summary("Set if marked members are also blacklisted or not")]
     [RequireUserPermission(GuildPermission.Administrator)]
-    public async Task SetMarkList([Summary("True means all marked marked members are blacklisted while marked")] bool state)
+    public async Task SetMarkList(bool state)
     {
       Config.Bot.Guilds[Context.Guild.Id].MarkList = state;
       var gid = Context.Guild.Id;
@@ -58,6 +58,18 @@ namespace HumanResources.Settings
       await ReplyAsync($":white_check_mark: Successfully set blacklist on mark to **{state}**");
     }
 
+    [Command("reset"), Alias("re"), Summary("Reset settings to defaults")]
+    [RequireUserPermission(GuildPermission.Administrator)]
+    public async Task ResetSettings()
+    {
+      var gc = new GuildConfig();
+      Config.Bot.Guilds[Context.Guild.Id].Prefix = gc.Prefix;
+      Config.Bot.Guilds[Context.Guild.Id].Mark = gc.Mark;
+      Config.Bot.Guilds[Context.Guild.Id].MarkList = gc.MarkList;
+      await ReplyAsync(":white_check_mark: Successfully reset prefix, mark and marklist settings");
+    }
+
+    #region Welcome
     [Group("welcome"), Alias("w")]
     public class Welcome : ModuleBase<SocketCommandContext>
     {
@@ -79,7 +91,7 @@ namespace HumanResources.Settings
 
       [Command("enable"), Alias("e"), Summary("Enable or disable the welcome functionality")]
       [RequireUserPermission(GuildPermission.Administrator)]
-      public async Task SetEnable([Summary("Set to true to enable")] bool state)
+      public async Task SetEnable(bool state)
       {
         Config.Bot.Guilds[Context.Guild.Id].Welcome.Enabled = state;
         await ReplyAsync(":white_check_mark: Successfully " + (state ? "enabled" : "disabled") + " welcome functionality");
@@ -87,7 +99,7 @@ namespace HumanResources.Settings
 
       [Command("time"), Alias("t"), Summary("Set the amount of minutes it takes before new users are given full server privileges")]
       [RequireUserPermission(GuildPermission.Administrator)]
-      public async Task SetTime([Summary("The new time in minutes")] uint time)
+      public async Task SetTime(uint time)
       {
         Config.Bot.Guilds[Context.Guild.Id].Welcome.Time = time;
         await ReplyAsync($":white_check_mark: Successfully set welcome time to **{time} minutes**");
@@ -95,7 +107,7 @@ namespace HumanResources.Settings
 
       [Command("role"), Alias("r"), Summary("Set the first role of new users")]
       [RequireUserPermission(GuildPermission.Administrator)]
-      public async Task SetRole([Summary("The new first role")] IRole role)
+      public async Task SetRole(IRole role)
       {
         if (role.IsManaged || role == Context.Guild.EveryoneRole)
         {
@@ -110,7 +122,7 @@ namespace HumanResources.Settings
 
       [Command("message"), Alias("m"), Summary("Set the welcome message")]
       [RequireUserPermission(GuildPermission.Administrator)]
-      public async Task SetMessage([Summary("The new welcome message, leave empty to disable functionality")] [Remainder] string msg = "")
+      public async Task SetMessage([Remainder] string msg = "")
       {
         Config.Bot.Guilds[Context.Guild.Id].Welcome.Message = msg;
         if (!string.IsNullOrEmpty(msg))
@@ -122,8 +134,18 @@ namespace HumanResources.Settings
           await ReplyAsync($":white_check_mark: Successfully disabled welcome message");
         }
       }
-    }
 
+      [Command("reset"), Alias("re"), Summary("Reset server welcome settings")]
+      [RequireUserPermission(GuildPermission.Administrator)]
+      public async Task Reset()
+      {
+        Config.Bot.Guilds[Context.Guild.Id].Welcome = new WelcomeConfig();
+        await ReplyAsync(":white_check_mark: Successfully reset guild welcome settings");
+      }
+    }
+    #endregion
+
+    #region Markov
     [Group("markov"), Alias("m")]
     public class Markov : ModuleBase<SocketCommandContext>
     {
@@ -199,6 +221,15 @@ namespace HumanResources.Settings
         Config.Bot.Guilds[Context.Guild.Id].Markov.Chance = chance;
         await ReplyAsync($":white_check_mark: Successfully set markov trigger chance to: {chance}%");
       }
+
+      [Command("reset"), Alias("re"), Summary("Reset server markov settings")]
+      [RequireUserPermission(GuildPermission.Administrator)]
+      public async Task Reset()
+      {
+        Config.Bot.Guilds[Context.Guild.Id].Markov = new MarkovConfig();
+        await ReplyAsync(":white_check_mark: Successfully reset guild markov settings");
+      }
     }
+    #endregion
   }
 }

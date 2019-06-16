@@ -14,7 +14,7 @@ namespace HumanResources.AdminModule
   {
     private static readonly Lazy<TimeoutResource> lazy = new Lazy<TimeoutResource>(() => new TimeoutResource());
     private readonly string Path = $"{Global.ResourceFolder}/timeout.json";
-    private Dictionary<ulong, Dictionary<ulong, TimeoutMember>> List { get; set; }
+    private Dictionary<ulong, Dictionary<ulong, TimeoutInfo>> List { get; set; }
 
     public static TimeoutResource Instance { get { return lazy.Value; } }
 
@@ -28,17 +28,17 @@ namespace HumanResources.AdminModule
       {
         Directory.CreateDirectory(Global.ResourceFolder);
       }
-      var temp = new Dictionary<ulong, Dictionary<ulong, TimeoutMember>>();
+      var temp = new Dictionary<ulong, Dictionary<ulong, TimeoutInfo>>();
       if (File.Exists(this.Path) ? JsonUtil.TryRead(this.Path, out temp) : JsonUtil.TryWrite(this.Path, temp))
       {
-        this.List = new Dictionary<ulong, Dictionary<ulong, TimeoutMember>>();
+        this.List = new Dictionary<ulong, Dictionary<ulong, TimeoutInfo>>();
         foreach (var gid in temp.Keys)
         {
           foreach (var uid in temp[gid].Keys)
           {
             if (this.Push(gid, uid))
             {
-              this.List[gid][uid] = new TimeoutMember();
+              this.List[gid][uid] = new TimeoutInfo();
               this.List[gid][uid].RoleIds.AddRange(temp[gid][uid].RoleIds);
               var tick = this.MakeTimer(gid, uid, temp[gid][uid].Time);
               if (tick == null)
@@ -83,7 +83,7 @@ namespace HumanResources.AdminModule
     {
       if (!this.List.ContainsKey(gid))
       {
-        this.List.Add(gid, new Dictionary<ulong, TimeoutMember>());
+        this.List.Add(gid, new Dictionary<ulong, TimeoutInfo>());
       }
       if (!this.List[gid].ContainsKey(uid))
       {
@@ -147,7 +147,7 @@ namespace HumanResources.AdminModule
         roles.AddRange(this.List[gid][uid].RoleIds);
         roles = roles.Distinct().ToList();
       }
-      this.List[gid][uid] = new TimeoutMember
+      this.List[gid][uid] = new TimeoutInfo
       {
         RoleIds = roles,
         Time = time,
@@ -199,13 +199,13 @@ namespace HumanResources.AdminModule
         LogUtil.Write("TimeoutResource:UnsetTimeout", e.Message);
       }
     }
-  }
 
-  public class TimeoutMember
-  {
-    public List<ulong> RoleIds { get; set; } = new List<ulong>();
-    public DateTime Time { get; set; }
-    [JsonIgnore]
-    public Timer Tick { get; set; }
+    private class TimeoutInfo
+    {
+      public List<ulong> RoleIds { get; set; } = new List<ulong>();
+      public DateTime Time { get; set; }
+      [JsonIgnore]
+      public Timer Tick { get; set; }
+    }
   }
 }

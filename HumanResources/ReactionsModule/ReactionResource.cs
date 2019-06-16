@@ -13,7 +13,7 @@ namespace HumanResources.ReactionsModule
   {
     private static readonly Lazy<ReactionResource> lazy = new Lazy<ReactionResource>(() => new ReactionResource());
     private readonly string Path = $"{Global.ResourceFolder}/reactions.json";
-    private Dictionary<ulong, Dictionary<ulong, ReactionHelper>> List { get; set; }
+    private Dictionary<ulong, Dictionary<ulong, ReactionInfo>> List { get; set; }
 
     public static ReactionResource Instance { get { return lazy.Value; } }
 
@@ -37,7 +37,7 @@ namespace HumanResources.ReactionsModule
       {
         Directory.CreateDirectory(Global.ResourceFolder);
       }
-      var temp = new Dictionary<ulong, Dictionary<ulong, ReactionHelper>>();
+      var temp = new Dictionary<ulong, Dictionary<ulong, ReactionInfo>>();
       if (File.Exists(this.Path) ? JsonUtil.TryRead(this.Path, out temp) : JsonUtil.TryWrite(this.Path, temp))
       {
         this.List = temp;
@@ -64,7 +64,7 @@ namespace HumanResources.ReactionsModule
       }
       if (!this.List.ContainsKey(gid))
       {
-        this.List.Add(gid, new Dictionary<ulong, ReactionHelper>());
+        this.List.Add(gid, new Dictionary<ulong, ReactionInfo>());
       }
       if (!this.List[gid].ContainsKey(id))
       {
@@ -80,7 +80,7 @@ namespace HumanResources.ReactionsModule
       {
         return false;
       }
-      this.List[gid][id] = new ReactionHelper
+      this.List[gid][id] = new ReactionInfo
       {
         Rgx = rgx,
         Phrases = new List<string>() { p },
@@ -163,13 +163,13 @@ namespace HumanResources.ReactionsModule
       this.List[gid][id].Phrases.RemoveAt(idx);
       return true;
     }
-  }
 
-  public class ReactionHelper
-  {
-    public Regex Rgx { get; set; }
-    public List<string> Phrases { get; set; }
-    public bool Enabled { get; set; } = true;
-    public string GetRandom(Random rand) => this.Phrases[rand.Next(0, this.Phrases.Count)];
+    private class ReactionInfo
+    {
+      public Regex Rgx { get; set; }
+      public List<string> Phrases { get; set; }
+      public bool Enabled { get; set; } = true;
+      public string GetRandom(Random rand) => this.Phrases[rand.Next(0, this.Phrases.Count)];
+    }
   }
 }
