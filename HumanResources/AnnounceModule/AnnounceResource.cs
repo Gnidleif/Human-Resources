@@ -3,7 +3,6 @@ using HumanResources.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace HumanResources.AnnounceModule
@@ -102,26 +101,38 @@ namespace HumanResources.AnnounceModule
 
     public bool SetState(ulong gid, string key, bool state)
     {
-      var ev = this.List[gid].Value.Events[key.ToLower()];
-      if (ev == null)
+      if (!this.List.ContainsKey(gid) || !this.List[gid].Value.Events.ContainsKey(key))
       {
         return false;
       }
-      var msg = ev.Item1;
+      var msg = this.List[gid].Value.Events[key.ToLower()].Item1;
       this.List[gid].Value.Events[key] = new Tuple<string, bool>(msg, state);
       return true;
     }
 
     public bool SetMsg(ulong gid, string key, string msg)
     {
-      var ev = this.List[gid].Value.Events[key.ToLower()];
-      if (ev == null)
+      if (!this.List.ContainsKey(gid) || !this.List[gid].Value.Events.ContainsKey(key))
       {
         return false;
       }
-      var state = ev.Item2;
+      var state = this.List[gid].Value.Events[key.ToLower()].Item2;
       this.List[gid].Value.Events[key] = new Tuple<string, bool>(msg, state);
       return true;
+    }
+
+    public Dictionary<string, string> GetAnnouncements(ulong gid)
+    {
+      if (!this.List.ContainsKey(gid) || this.List[gid].Value.Events.Count == 0)
+      {
+        return null;
+      }
+      var result = new Dictionary<string, string>();
+      foreach(var a in this.List[gid].Value.Events)
+      {
+        result.Add(a.Key, $"Message: '{a.Value.Item1}', State: " + (a.Value.Item2 == true ? "Enabled" : "Disabled"));
+      }
+      return result;
     }
 
     private class AnnounceInfo

@@ -2,6 +2,7 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using HumanResources.AdminModule;
+using HumanResources.AnnounceModule;
 using HumanResources.Utilities;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ namespace HumanResources.Settings
   [RequireContext(ContextType.Guild)]
   public class Settings : ModuleBase<SocketCommandContext>
   {
+    #region Basic
     [Command, Summary("Returns the bot settings for the guild")]
     public async Task GetSettings()
     {
@@ -68,6 +70,7 @@ namespace HumanResources.Settings
       Config.Bot.Guilds[Context.Guild.Id].MarkList = gc.MarkList;
       await ReplyAsync(":white_check_mark: Successfully reset prefix, mark and marklist settings");
     }
+    #endregion
 
     #region Welcome
     [Group("welcome"), Alias("w")]
@@ -228,6 +231,78 @@ namespace HumanResources.Settings
       {
         Config.Bot.Guilds[Context.Guild.Id].Markov = new MarkovConfig();
         await ReplyAsync(":white_check_mark: Successfully reset guild markov settings");
+      }
+    }
+    #endregion
+
+    #region Announce
+    [Group("announce"), Alias("an")]
+    [RequireContext(ContextType.Guild)]
+    [RequireUserPermission(GuildPermission.Administrator)]
+    public class Announce : ModuleBase<SocketCommandContext>
+    {
+      [Command, Summary("Get the guild announcement settings")]
+      public async Task GetSettings()
+      {
+        var list = AnnounceResource.Instance.GetAnnouncements(Context.Guild.Id);
+        if (list == null)
+        {
+          await Context.User.SendMessageAsync(":negative_squared_cross_mark: Unable to retrieve announcement settings for that guild");
+          return;
+        }
+
+        var embed = new EmbedBuilder();
+        var user = Context.User as SocketGuildUser;
+        embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl());
+        foreach(var r in list)
+        {
+          embed.AddField(r.Key, r.Value, true);
+        }
+        embed.WithFooter(LogUtil.LogTime);
+        await ReplyAsync("", false, embed.Build());
+      }
+
+      [Command("channel"), Alias("ch"), Summary("Edit the output channel for guild announcements")]
+      public async Task EditChannel(IChannel channel)
+      {
+        if (AnnounceResource.Instance.Push(Context.Guild.Id, channel.Id))
+        {
+          await ReplyAsync($":white_check_mark: Successfully added guild announcement feature");
+        }
+        else if (AnnounceResource.Instance.SetChannel(Context.Guild.Id, channel.Id))
+        {
+          await ReplyAsync($":white_check_mark: Successfully changed guild announcement channel to <#{channel.Id}>");
+        }
+        else
+        {
+          await Context.User.SendMessageAsync($":negative_squared_cross_mark: Editing guild announcement channel failed");
+        }
+      }
+
+      [Command("enable"), Alias("e"), Summary("Edit the enabled/disabled state of a certain guild announcement")]
+      public async Task EditState(string name, bool state)
+      {
+        if (AnnounceResource.Instance.SetState(Context.Guild.Id, name, state))
+        {
+          await ReplyAsync(":white_check_mark: Successfully " + (state == true ? "enabled" : "disabled") + $" the **{name}** announcement");
+        }
+        else
+        {
+          await Context.User.SendMessageAsync($":negative_squared_cross_mark: Unable to set state of the **{name}** announcement");
+        }
+      }
+
+      [Command("message"), Alias("msg"), Summary("Edit the announcement message of a certain guild announcement")]
+      public async Task EditMsg(string name, [Remainder] string msg)
+      {
+        if (AnnounceResource.Instance.SetMsg(Context.Guild.Id, name, msg))
+        {
+          await ReplyAsync($":white_check_mark: Successfully edited the **{name}** announcement message");
+        }
+        else
+        {
+          await Context.User.SendMessageAsync($":negative_squared_cross_mark: Unable to edit the **{name}** announcement message");
+        }
       }
     }
     #endregion

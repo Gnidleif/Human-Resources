@@ -1,15 +1,11 @@
-﻿using Discord.WebSocket;
-using HumanResources.Utilities;
+﻿using HumanResources.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Tweetinvi;
 using Tweetinvi.Models;
-using Tweetinvi.Streaming;
-using Tweetinvi.Streams;
 
 namespace HumanResources.TwitterModule
 {

@@ -43,6 +43,7 @@ The markov chain functionality randomly outputs a message of a specific length w
 * **s**ettings **p**refi**x** !char - Set command prefix for the guild (**admin**)
 * **s**ettings **m**ar**k** !char - Set mark for the guild (**admin**)
 * **s**ettings **m**ark**l**ist !bool - Set if marked members are also blacklisted (**admin**)
+* **s**ettings **re**set - Resets the prefix, mark and marklist settings to defaults (**admin**)
 
 #### Welcome settings - Get and set guild settings related to the welcome functionality
 
@@ -51,6 +52,7 @@ The markov chain functionality randomly outputs a message of a specific length w
 * **s**ettings **w**elcome **t**ime !ulong - Set the guild welcome time (**admin**)
 * **s**ettings **w**elcome **r**ole !string/ulong - Set the first role of new users (**admin**)
 * **s**ettings **w**elcome **m**essage !...string - Set the new guild welcome message (**admin**)
+* **s**ettings **w**elcome **re**set - Reset guild welcome settings to default (**admin**) 
 
 #### Markov settings - Get and set guild settings related to the markov chain functionality
 
@@ -59,6 +61,14 @@ The markov chain functionality randomly outputs a message of a specific length w
 * **s**ettings **m**arkov **c**ount !uint - Set markov word count (**admin**)
 * **s**ettings **m**arkov **so**urce !uint - Set markov source count (**admin**)
 * **s**ettings **m**arkov **ch**ance !uint - Set markov trigger chance (**admin**)
+* **s**ettings **m**arkov **re**set - Reset markov settings to default (**admin**)
+
+#### Announcement settings - Set guild settings related to announcements
+
+* **s**ettings **an**nounce - Get the current announcement settings of the guild (**admin**)
+* **s**ettings **an**nounce **ch**annel !string/ulong - Set the given channel as the announcement channel (**admin**)
+* **s**ettings **an**nounce **e**nable !key !bool - Set the announement given by key to the set state (**admin**)
+* **s**ettings **an**nounce **m**e**s**sa**g**e !key !...string - Set the announcement message of the given key (**admin**)
 
 ### Administration - Standard administrative guild functions
 
@@ -74,7 +84,7 @@ The markov chain functionality randomly outputs a message of a specific length w
 * **bl**acklist **r**emove !string/ulong - Removes user from blacklist (**admin**)
 * **t**ime**o**ut !string/ulong uint=10, ...string - Set user on timeout, set time to 0 for random 10-5000 (**admin**)
 * **t**ime**o**ut **r**emove !string/ulong - Removes user from timeout (**admin**)
-* **t**ime**o**ut **setup** - Sets up the @everyone role for timeout usage (**admin**)
+* **t**ime**o**ut **s**etup - Sets up the @everyone role for timeout usage (**admin**)
 * **m**ar**k** !string/ulong ...string - Set guild mark on user (**admin**)
 * **m**ar**k** **r**emove !string/ulong - Remove guild mark from user (**admin**)
 

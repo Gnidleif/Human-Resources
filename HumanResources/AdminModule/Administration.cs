@@ -321,7 +321,7 @@ namespace HumanResources.AdminModule
         }
       }
 
-      [Command("setup"), Summary("Sets up the guild for timeout usage")]
+      [Command("setup"), Alias("s"), Summary("Sets up the guild for timeout usage")]
       [RequireBotPermission(GuildPermission.ManageRoles)]
       public async Task Setup()
       {
