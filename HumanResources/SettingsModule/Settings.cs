@@ -259,7 +259,7 @@ namespace HumanResources.Settings
           embed.AddField(r.Key, r.Value, true);
         }
         embed.WithFooter(LogUtil.LogTime);
-        await ReplyAsync("", false, embed.Build());
+        await Context.User.SendMessageAsync("", false, embed.Build());
       }
 
       [Command("channel"), Alias("ch"), Summary("Edit the output channel for guild announcements")]
