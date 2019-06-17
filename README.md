@@ -39,8 +39,12 @@ The announcement feature is used to let other users know when a user has joined 
   * Chance - 0
 * Announcement
   * Channel - null
-  * userjoined - ":white_check_mark: {0} just joined the server, welcome!", true
-  * userleft - ":negative_squared_cross_mark: {0} just left the server, good bye!", true
+  * userjoined 
+    * Message: :white_check_mark: {0} just joined the server, welcome!
+    * State: true
+  * userleft
+    * Message: :negative_squared_cross_mark: {0} just left the server, good bye!
+    * State: true
 
 ## Features
 
