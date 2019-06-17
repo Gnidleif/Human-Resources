@@ -235,11 +235,11 @@ namespace HumanResources.Settings
     }
     #endregion
 
-    #region Announce
-    [Group("announce"), Alias("an")]
+    #region Announcement
+    [Group("announcement"), Alias("an")]
     [RequireContext(ContextType.Guild)]
     [RequireUserPermission(GuildPermission.Administrator)]
-    public class Announce : ModuleBase<SocketCommandContext>
+    public class Announcement : ModuleBase<SocketCommandContext>
     {
       [Command, Summary("Get the guild announcement settings")]
       public async Task GetSettings()
@@ -247,7 +247,7 @@ namespace HumanResources.Settings
         var list = AnnounceResource.Instance.GetAnnouncements(Context.Guild.Id);
         if (list == null)
         {
-          await Context.User.SendMessageAsync(":negative_squared_cross_mark: Unable to retrieve announcement settings for that guild");
+          await Context.User.SendMessageAsync(":negative_squared_cross_mark: No announcement settings configured for guild, run <prefix>settings announcement channel <channel id> to get started");
           return;
         }
 
@@ -256,10 +256,16 @@ namespace HumanResources.Settings
         embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl());
         foreach(var r in list)
         {
-          embed.AddField(r.Key, r.Value, true);
+          if (r.Value != null)
+          {
+            embed.AddField(r.Key, r.Value, true);
+          }
+          else
+          {
+            embed.WithDescription($"**Channel**: <#{r.Key}>");
+          }
         }
-        embed.WithFooter(LogUtil.LogTime);
-        await Context.User.SendMessageAsync("", false, embed.Build());
+        await ReplyAsync("", false, embed.Build());
       }
 
       [Command("channel"), Alias("ch"), Summary("Edit the output channel for guild announcements")]

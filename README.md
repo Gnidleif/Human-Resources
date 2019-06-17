@@ -18,9 +18,13 @@ If this functionality is enabled new members are greeted with a message and will
 
 The markov chain functionality randomly outputs a message of a specific length whenever a non-command line is written in a channel. It uses filtered previously written messages in the channel where it triggers to generate the message. Source is by default set to 500 since messages can only be retrieved at a rate of 100/request and a request takes ~0.2 seconds.
 
+## Announcements
+
+The announcement feature is used to let other users know when a user has joined or left the server. To set this up simply run **settings announcement channel <channel name or id>**. These messages can be individually configured or disabled.
+
 ## Default guild settings
 
-* Prefix - !
+* Prefix - ! (mentioning the bot at the start of a message also works)
 * Mark - ⭐
 * Marklist - false
 * Welcome
@@ -33,6 +37,10 @@ The markov chain functionality randomly outputs a message of a specific length w
   * Count - 20
   * Source - 500
   * Chance - 0
+* Announcement
+  * Channel - null
+  * userjoined - ":white_check_mark: {0} just joined the server, welcome!", true
+  * userleft - ":negative_squared_cross_mark: {0} just left the server, good bye!", true
 
 ## Features
 

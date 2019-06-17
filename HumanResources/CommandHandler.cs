@@ -64,7 +64,7 @@ namespace HumanResources
       if (msg.HasCharPrefix(settings.Prefix, ref argPos) || msg.HasMentionPrefix(Global.Client.CurrentUser, ref argPos))
       {
         var result = await this.Service.ExecuteAsync(ctx, argPos, null);
-        if (!result.IsSuccess && result.Error != CommandError.UnknownCommand)
+        if (!result.IsSuccess)
         {
           LogUtil.Write("Client_MessageReceived", $"Message: {msg.Content} | Error: {result.ErrorReason}");
           await ctx.User.SendMessageAsync(result.ErrorReason);

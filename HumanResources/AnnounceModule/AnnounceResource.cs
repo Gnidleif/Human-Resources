@@ -127,10 +127,13 @@ namespace HumanResources.AnnounceModule
       {
         return null;
       }
-      var result = new Dictionary<string, string>();
+      var result = new Dictionary<string, string>
+      {
+        { this.List[gid].Key.ToString(), null },
+      };
       foreach(var a in this.List[gid].Value.Events)
       {
-        result.Add(a.Key, $"Message: '{a.Value.Item1}', State: " + (a.Value.Item2 == true ? "Enabled" : "Disabled"));
+        result.Add(a.Key, $"**Message**: '{a.Value.Item1}'\n**State**: " + (a.Value.Item2 == true ? "Enabled" : "Disabled"));
       }
       return result;
     }
