@@ -231,14 +231,14 @@ namespace HumanResources.TwitterModule
       }
       return result;
     }
-  }
 
-  public class TwitterInfo
-  {
-    public string ConsumerKey { get; set; } = string.Empty;
-    public string ConsumerSecret { get; set; } = string.Empty;
-    public string AccessToken { get; set; } = string.Empty;
-    public string AccessTokenSecret { get; set; } = string.Empty;
-    public Dictionary<ulong, HashSet<ulong>> List { get; set; } = new Dictionary<ulong, HashSet<ulong>>();
+    private class TwitterInfo
+    {
+      public string ConsumerKey { get; set; } = string.Empty;
+      public string ConsumerSecret { get; set; } = string.Empty;
+      public string AccessToken { get; set; } = string.Empty;
+      public string AccessTokenSecret { get; set; } = string.Empty;
+      public Dictionary<ulong, HashSet<ulong>> List { get; set; } = new Dictionary<ulong, HashSet<ulong>>();
+    }
   }
 }
