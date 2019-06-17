@@ -1,7 +1,10 @@
 ﻿using Discord;
 using Discord.Commands;
 using HumanResources.Utilities;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace HumanResources.TwitterModule
@@ -9,7 +12,7 @@ namespace HumanResources.TwitterModule
   [Group("twitter"), Alias("tw")]
   public class Twitter : ModuleBase<SocketCommandContext>
   {
-    [Command, Summary("Retrieves a Twitter user specified by handle/id")]
+    [Command("search"), Alias("s"), Summary("Retrieves a Twitter user specified by handle/id")]
     public async Task GetUser(string identifier, bool verbose = false)
     {
       var user = TwitterResource.Instance.GetUser(identifier);
@@ -107,6 +110,32 @@ namespace HumanResources.TwitterModule
         else
         {
           await Context.User.SendMessageAsync($":negative_squared_cross_mark: Already not following {user.ScreenName} in {channel}");
+        }
+      }
+
+      [Command("list"), Alias("l"), Summary("List all followed user in the guild")]
+      public async Task ListUsers()
+      {
+        var guild = Context.Guild as IGuild;
+        var chans = (await guild.GetTextChannelsAsync()).Select(x => x.Id).ToList();
+        var list = TwitterResource.Instance.GetStreamList(chans);
+        if (list.Any())
+        {
+          var gu = Context.User as IGuildUser;
+          var embed = new EmbedBuilder();
+          embed.WithAuthor(gu.Nickname ?? gu.Username, gu.GetAvatarUrl() ?? gu.GetDefaultAvatarUrl());
+          var sb = new StringBuilder();
+          foreach(var item in list)
+          {
+            var formatted = new List<string>();
+            foreach(var user in item.Value)
+            {
+              formatted.Add($"[{user.ScreenName}]({user.Url})");
+            }
+            sb.AppendLine($"<#{item.Key}>: {string.Join(", ", formatted)}");
+          }
+          embed.WithDescription(sb.ToString());
+          await ReplyAsync("", false, embed.Build());
         }
       }
     }

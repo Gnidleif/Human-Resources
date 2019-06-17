@@ -2,6 +2,8 @@
 
 General purpose Discord bot with a focus on administrative functionality written in C#. To get this bot working at it's best it's recommended to set it as guild administrator. 
 
+Please join the support server if you have any issues or questions: https://discord.gg/d82jEVc
+
 ## Timeout
 
 To get the timeout functionality to work properly it's advisable to remove the ability for people with **only** the @everybody role to be unable to speak. The reason for this is that the timeout command removes any roles except the @everybody role.
@@ -102,9 +104,10 @@ The announcement feature is used to let other users know when a user has joined 
 
 ### Twitter - Various Twitter related functions
 
-* **tw**itter !string/ulong bool=false - Returns information on Twitter user, set bool to true for verbose
-* **tw**itter **f**ollow !ulong/string !ulong/string - Follow a specified twitter user and output their tweets in the given channel
-* **tw**itter **f**ollow remove !ulong/string !ulong/string - Unfollow a specified twitter user in a given channel
+* **tw**itter **s**earch !string/ulong bool=false - Returns information on Twitter user, set bool to true for verbose
+* **tw**itter **f**ollow !ulong/string !ulong/string - Follow a specified twitter user and output their tweets in the given channel (**admin**)
+* **tw**itter **f**ollow **r**emove !ulong/string !ulong/string - Unfollow a specified twitter user in a given channel (**admin**)
+* **tw**itter **f**ollow **l**ist - Get complete follow list of guild (**admin**)
 
 ### General
 

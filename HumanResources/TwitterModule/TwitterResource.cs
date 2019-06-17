@@ -203,6 +203,34 @@ namespace HumanResources.TwitterModule
       }
       return false;
     }
+
+    public Dictionary<ulong, List<IUser>> GetStreamList(List<ulong> allChans)
+    {
+      var result = new Dictionary<ulong, List<IUser>>();
+      foreach (var item in this.Info.List)
+      {
+        foreach (var cid in item.Value)
+        {
+          if (allChans.Contains(cid))
+          {
+            var user = User.GetUserFromId((long)item.Key);
+            if (user == null)
+            {
+              continue;
+            }
+            if (!result.ContainsKey(cid))
+            {
+              result.Add(cid, new List<IUser> { user });
+            }
+            else
+            {
+              result[cid].Add(user);
+            }
+          }
+        }
+      }
+      return result;
+    }
   }
 
   public class TwitterInfo
