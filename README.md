@@ -20,7 +20,7 @@ The markov chain functionality randomly outputs a message of a specific length w
 
 ## Announcements
 
-The announcement feature is used to let other users know when a user has joined or left the server. To set this up simply run **settings announcement channel <channel name or id>**. These messages can be individually configured or disabled.
+The announcement feature is used to let other users know when a user has joined or left the server. To set this up simply run **settings announcement channel !CHANNEL REFERENCE**. These messages can be individually configured or disabled.
 
 ## Default guild settings
 
@@ -73,10 +73,10 @@ The announcement feature is used to let other users know when a user has joined 
 
 #### Announcement settings - Set guild settings related to announcements
 
-* **s**ettings **an**nounce - Get the current announcement settings of the guild (**admin**)
-* **s**ettings **an**nounce **ch**annel !string/ulong - Set the given channel as the announcement channel (**admin**)
-* **s**ettings **an**nounce **e**nable !key !bool - Set the announement given by key to the set state (**admin**)
-* **s**ettings **an**nounce **m**e**s**sa**g**e !key !...string - Set the announcement message of the given key (**admin**)
+* **s**ettings **an**nouncement - Get the current announcement settings of the guild (**admin**)
+* **s**ettings **an**nouncement **ch**annel !string/ulong - Set the given channel as the announcement channel (**admin**)
+* **s**ettings **an**nouncement **e**nable !key !bool - Set the announement given by key to the set state (**admin**)
+* **s**ettings **an**nouncement **m**e**s**sa**g**e !key !...string - Set the announcement message of the given key (**admin**)
 
 ### Administration - Standard administrative guild functions
 
