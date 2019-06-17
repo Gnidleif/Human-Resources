@@ -103,6 +103,8 @@ The announcement feature is used to let other users know when a user has joined 
 ### Twitter - Various Twitter related functions
 
 * **tw**itter !string/ulong bool=false - Returns information on Twitter user, set bool to true for verbose
+* **tw**itter **f**ollow !ulong/string !ulong/string - Follow a specified twitter user and output their tweets in the given channel
+* **tw**itter **f**ollow remove !ulong/string !ulong/string - Unfollow a specified twitter user in a given channel
 
 ### General
 

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Tweetinvi;
 using Tweetinvi.Models;
@@ -14,7 +15,9 @@ namespace HumanResources.TwitterModule
     private static readonly Lazy<TwitterResource> lazy = new Lazy<TwitterResource>(() => new TwitterResource());
     private readonly string Path = $"{Global.ResourceFolder}/twitter.json";
     private TwitterInfo Info { get; set; } = new TwitterInfo();
-    private ITwitterCredentials Credentials { get; set; } 
+    private ITwitterCredentials Credentials { get; set; }
+    private Tweetinvi.Streaming.IFilteredStream Stream { get; set; }
+    private Thread StreamThread { get; set; }
 
     public static TwitterResource Instance { get { return lazy.Value; } }
     public readonly string Icon = "https://images-ext-1.discordapp.net/external/bXJWV2Y_F3XSra_kEqIYXAAsI3m1meckfLhYuWzxIfI/https/abs.twimg.com/icons/apple-touch-icon-192x192.png";
@@ -44,14 +47,56 @@ namespace HumanResources.TwitterModule
       {
         this.Info = temp;
         await this.Authenticate();
-      }
 
-      foreach (var uid in this.Info.List.Keys)
-      {
-        var user = User.GetUserFromId((long)uid);
-        if (user != null)
+        this.Stream.StreamPaused += (sender, args) =>
         {
-          this.StartFollowing(user);
+          LogUtil.Write("TwitterResource:StreamPaused", "Stream conditions not met");
+        };
+
+        this.Stream.StreamStopped += (sender, args) =>
+        {
+          if (args.Exception != null)
+          {
+            LogUtil.Write("TwitterResource:StreamStopped", args.Exception.Message);
+          }
+          if (args.DisconnectMessage != null)
+          {
+            LogUtil.Write("TwitterResource:StreamStopped", args.DisconnectMessage.Reason);
+          }
+        };
+
+        this.Stream.StreamStarted += (sender, args) =>
+        {
+          LogUtil.Write("TwitterResource:StreamStarted", "Stream conditions met");
+        };
+
+        this.Stream.MatchingTweetReceived += async (sender, args) =>
+        {
+          if (!args.Tweet.IsRetweet && 
+            (args.MatchOn == Tweetinvi.Streaming.MatchOn.Follower || args.MatchOn == (Tweetinvi.Streaming.MatchOn.Follower | Tweetinvi.Streaming.MatchOn.FollowerInReplyTo)))
+          {
+            var user = User.GetUserFromId(args.Tweet.CreatedBy.Id);
+            var embed = new Discord.EmbedBuilder();
+            embed.WithAuthor($"{user.Name} (@{user.ScreenName})", user.ProfileImageUrl, args.Tweet.Url);
+            embed.WithDescription(args.Tweet.FullText);
+            embed.WithColor(new Discord.Color(56, 161, 243));
+            embed.WithFooter($"{LogUtil.FormattedDate(args.Tweet.CreatedAt)}", this.Icon);
+            var build = embed.Build();
+
+            foreach(var cid in this.Info.List[(ulong)user.Id])
+            {
+              var ch = Global.Client.GetChannel(cid) as Discord.IMessageChannel;
+              if (ch != null)
+              {
+                await ch.SendMessageAsync("", false, build);
+              }
+            }
+          }
+        };
+
+        foreach (var uid in this.Info.List.Keys)
+        {
+          this.StartFollowing(uid);
         }
       }
     }
@@ -62,6 +107,7 @@ namespace HumanResources.TwitterModule
       try
       {
         Auth.SetCredentials(this.Credentials);
+        this.Stream = Tweetinvi.Stream.CreateFilteredStream(this.Credentials);
       }
       catch (Exception e)
       {
@@ -77,11 +123,7 @@ namespace HumanResources.TwitterModule
         this.Info.List[uid].Remove(cid);
         if (!this.Info.List[uid].Any())
         {
-          var user = User.GetUserFromId((long)uid);
-          if (user != null)
-          {
-            this.StopFollowing(user);
-          }
+          this.StopFollowing(uid);
         }
         return true;
       }
@@ -99,7 +141,7 @@ namespace HumanResources.TwitterModule
       if (!this.Contains(uid, cid))
       {
         this.Info.List[uid].Add(cid);
-        _ = this.StartFollowing(User.GetUserFromId((long)uid));
+        _ = this.StartFollowing(uid);
         return true;
       }
       return false;
@@ -117,13 +159,53 @@ namespace HumanResources.TwitterModule
       return u ?? User.GetUserFromScreenName(identifier);
     }
 
-    private bool StartFollowing(IUser user)
+    private bool StartFollowing(ulong uid)
     {
+      var id = (long)uid;
+      if (!this.Stream.ContainsFollow(id))
+      {
+        this.Stream.AddFollow(id);
+        this.SafeStartStream();
+        return true;
+      }
       return false;
     }
 
-    private bool StopFollowing(IUser user)
+    private bool StopFollowing(ulong uid)
     {
+      var id = (long)uid;
+      if (this.Stream.ContainsFollow(id))
+      {
+        this.Stream.RemoveFollow(id);
+        if (!this.Stream.FollowingUserIds.Any())
+        {
+          this.SafeStopStream();
+        }
+        return true;
+      }
+      return false;
+    }
+
+    private void SafeStartStream()
+    {
+      if (this.Stream.StreamState == StreamState.Running || !this.Stream.FollowingUserIds.Any())
+      {
+        return;
+      }
+      this.StreamThread = new Thread(new ThreadStart(() =>
+      {
+        this.Stream.StartStreamMatchingAllConditions();
+      }));
+      this.StreamThread.Start();
+    }
+
+    private bool SafeStopStream()
+    {
+      if (this.Stream.StreamState == StreamState.Running)
+      {
+        this.Stream.StopStream();
+        return true;
+      }
       return false;
     }
   }

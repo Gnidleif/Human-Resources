@@ -36,46 +36,53 @@ namespace HumanResources
 
     private async Task Client_MessageReceived(SocketMessage arg)
     {
-      var msg = arg as SocketUserMessage;
-      if (msg == null)
+      try
       {
-        return;
-      }
-
-      var ctx = new SocketCommandContext(Global.Client, msg);
-      if (ctx.User.IsBot)
-      {
-        return;
-      }
-
-      var resp = string.Join("\n", ReactionResource.Instance.Find(ctx.Guild.Id, msg.Content));
-      if (!string.IsNullOrEmpty(resp))
-      {
-        await ctx.Channel.SendMessageAsync(resp);
-      }
-
-      if (BlacklistResource.Instance.Contains(ctx.Guild.Id, ctx.User.Id))
-      {
-        return;
-      }
-
-      int argPos = 0;
-      var settings = Config.Bot.Guilds[ctx.Guild.Id];
-      if (msg.HasCharPrefix(settings.Prefix, ref argPos) || msg.HasMentionPrefix(Global.Client.CurrentUser, ref argPos))
-      {
-        var result = await this.Service.ExecuteAsync(ctx, argPos, null);
-        if (!result.IsSuccess)
+        var msg = arg as SocketUserMessage;
+        if (msg == null)
         {
-          LogUtil.Write("Client_MessageReceived", $"Message: {msg.Content} | Error: {result.ErrorReason}");
-          await ctx.User.SendMessageAsync(result.ErrorReason);
+          return;
+        }
+
+        var ctx = new SocketCommandContext(Global.Client, msg);
+        if (ctx.User.IsBot)
+        {
+          return;
+        }
+
+        var resp = string.Join("\n", ReactionResource.Instance.Find(ctx.Guild.Id, msg.Content));
+        if (!string.IsNullOrEmpty(resp))
+        {
+          await ctx.Channel.SendMessageAsync(resp);
+        }
+
+        if (BlacklistResource.Instance.Contains(ctx.Guild.Id, ctx.User.Id))
+        {
+          return;
+        }
+
+        int argPos = 0;
+        var settings = Config.Bot.Guilds[ctx.Guild.Id];
+        if (msg.HasCharPrefix(settings.Prefix, ref argPos) || msg.HasMentionPrefix(Global.Client.CurrentUser, ref argPos))
+        {
+          var result = await this.Service.ExecuteAsync(ctx, argPos, null);
+          if (!result.IsSuccess)
+          {
+            LogUtil.Write("Client_MessageReceived", $"Message: {msg.Content} | Error: {result.ErrorReason}");
+            await ctx.User.SendMessageAsync(result.ErrorReason);
+          }
+        }
+        else if (new Random(DateTime.UtcNow.Millisecond).Next(1, 100 + 1) <= settings.Markov.Chance)
+        {
+          using (ctx.Channel.EnterTypingState())
+          {
+            await MarkovTalk(ctx, (int)settings.Markov.Source, (int)settings.Markov.Step, (int)settings.Markov.Count);
+          }
         }
       }
-      else if (new Random(DateTime.UtcNow.Millisecond).Next(1, 100 + 1) <= settings.Markov.Chance)
+      catch (Exception e)
       {
-        using (ctx.Channel.EnterTypingState())
-        {
-          await MarkovTalk(ctx, (int)settings.Markov.Source, (int)settings.Markov.Step, (int)settings.Markov.Count);
-        }
+        LogUtil.Write("CommandHandler:Client_MessageReceived", e.Message);
       }
     }
 
