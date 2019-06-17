@@ -48,20 +48,15 @@ namespace HumanResources.TwitterModule
         this.Info = temp;
         await this.Authenticate();
 
-        this.Stream.StreamPaused += (sender, args) =>
-        {
-          LogUtil.Write("TwitterResource:StreamPaused", "Stream conditions not met");
-        };
-
         this.Stream.StreamStopped += (sender, args) =>
         {
           if (args.Exception != null)
           {
-            LogUtil.Write("TwitterResource:StreamStopped", args.Exception.Message);
+            LogUtil.Write("TwitterResource:StreamStopped", $"Message: {args.Exception.Message}");
           }
           if (args.DisconnectMessage != null)
           {
-            LogUtil.Write("TwitterResource:StreamStopped", args.DisconnectMessage.Reason);
+            LogUtil.Write("TwitterResource:StreamStopped", $"Reason: {args.DisconnectMessage.Reason}");
           }
         };
 
@@ -188,7 +183,7 @@ namespace HumanResources.TwitterModule
 
     private void SafeStartStream()
     {
-      if (this.Stream.StreamState == StreamState.Running || !this.Stream.FollowingUserIds.Any())
+      if ((this.StreamThread != null && this.StreamThread.IsAlive) || this.Stream.StreamState == StreamState.Running || !this.Stream.FollowingUserIds.Any())
       {
         return;
       }
