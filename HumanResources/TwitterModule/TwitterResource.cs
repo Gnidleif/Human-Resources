@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using Tweetinvi;
 using Tweetinvi.Models;
 
@@ -50,19 +51,53 @@ namespace HumanResources.TwitterModule
 
         this.Stream.StreamStopped += (sender, args) =>
         {
+          LogUtil.Write("TwitterResource", "Stream stopped");
           if (args.Exception != null)
           {
-            LogUtil.Write("TwitterResource:StreamStopped", $"Message: {args.Exception.Message}");
+            LogUtil.Write("TwitterResource", $"Message: {args.Exception.Message}");
+            if (args.Exception.InnerException != null)
+            {
+              LogUtil.Write("TwitterResource", $"Inner Exception: {args.Exception.InnerException.Message}");
+            }
           }
           if (args.DisconnectMessage != null)
           {
-            LogUtil.Write("TwitterResource:StreamStopped", $"Reason: {args.DisconnectMessage.Reason}");
+            LogUtil.Write("TwitterResource", $"Reason: {args.DisconnectMessage.Reason}");
+          }
+
+          if (!this.SafeStartStream())
+          {
+            var timer = new System.Timers.Timer
+            {
+              Interval = 5000,
+              AutoReset = false,
+              Enabled = true,
+            };
+            timer.Elapsed += (s, a) =>
+            {
+              timer.Stop();
+              try
+              {
+                if (!SafeStartStream())
+                {
+                  timer.Start();
+                }
+              }
+              catch (Exception e)
+              {
+                LogUtil.Write("TwitterResource", e.Message);
+              }
+              finally
+              {
+                timer.Start();
+              }
+            };
           }
         };
 
         this.Stream.StreamStarted += (sender, args) =>
         {
-          LogUtil.Write("TwitterResource:StreamStarted", "Stream conditions met");
+          LogUtil.Write("TwitterResource", "Stream started");
         };
 
         this.Stream.MatchingTweetReceived += async (sender, args) =>
@@ -181,17 +216,37 @@ namespace HumanResources.TwitterModule
       return false;
     }
 
-    private void SafeStartStream()
+    private bool SafeStartStream()
     {
       if ((this.StreamThread != null && this.StreamThread.IsAlive) || this.Stream.StreamState == StreamState.Running || !this.Stream.FollowingUserIds.Any())
       {
-        return;
+        return false;
       }
-      this.StreamThread = new Thread(new ThreadStart(() =>
+      var check = User.GetUsersFromIds(this.Stream.FollowingUserIds.Select(x => x.Key.GetValueOrDefault())).ToList();
+      if (check.Count != this.Stream.FollowingUserIds.Count)
       {
-        this.Stream.StartStreamMatchingAllConditions();
-      }));
-      this.StreamThread.Start();
+        foreach(var id in this.Stream.FollowingUserIds.Keys)
+        {
+          var u = User.GetUserFromId(id.Value);
+          if (u == null)
+          {
+            this.StopFollowing((ulong)id);
+          }
+        }
+      }
+      try
+      {
+        this.StreamThread = new Thread(new ThreadStart(() =>
+        {
+          this.Stream.StartStreamMatchingAllConditions();
+        }));
+        this.StreamThread.Start();
+      }
+      catch
+      {
+        return false;
+      }
+      return true;
     }
 
     private bool SafeStopStream()

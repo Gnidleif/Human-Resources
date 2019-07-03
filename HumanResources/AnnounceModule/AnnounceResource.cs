@@ -58,7 +58,7 @@ namespace HumanResources.AnnounceModule
         var ch = Global.Client.GetChannel(this.List[gid].Key) as SocketTextChannel;
         if (ch != null && ev.Item2 == true)
         {
-          await ch.SendMessageAsync(string.Format(ev.Item1, arg.Mention));
+          await ch.SendMessageAsync(string.Format(ev.Item1, arg.Username));
         }
       }
     }

@@ -331,7 +331,7 @@ namespace HumanResources.AdminModule
           x.Mentionable = true;
           x.Permissions = new GuildPermissions(true, false, false, false, false, false, false, false, true, false, false, false, false, false, true, false, false, false, false, false, false, false, true, false, true, false, false, false, false);
         });
-        await Context.User.SendMessageAsync("Successfully set up the @everyone role to use the timeout functionality");
+        await Context.User.SendMessageAsync(":white_check_mark: Successfully set up the @everyone role to use the timeout functionality");
       }
     }
     #endregion
