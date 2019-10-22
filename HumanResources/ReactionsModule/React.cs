@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 namespace HumanResources.ReactionsModule
 {
   [RequireContext(ContextType.Guild)]
-  [RequireUserPermission(GuildPermission.Administrator)]
   [Group("react"), Alias("r"), Summary("Collection of functions used to make the bot react to certain phrases")]
   public class React : ModuleBase<SocketCommandContext>
   {
@@ -23,22 +22,35 @@ namespace HumanResources.ReactionsModule
         await Context.User.SendMessageAsync($"No results found");
         return;
       }
-      var embed = new EmbedBuilder();
+
       var user = Context.User as SocketGuildUser;
-      embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
-      embed.WithDescription($"```json\n{json}\n```");
-      embed.WithFooter(LogUtil.LogTime);
-      if (id == default)
+      var desc = $"```json\n{json}\n```";
+      try
       {
-        await Context.User.SendMessageAsync("", false, embed.Build());
-        await Context.Message.DeleteAsync();
+        if (id == default)
+        {
+          await user.SendMessageAsync(desc);
+        }
+        else
+        {
+          var embed = new EmbedBuilder();
+          embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
+          embed.WithDescription(desc);
+          embed.WithFooter(LogUtil.LogTime);
+          await ReplyAsync("", false, embed.Build());
+        }
       }
-      else
+      catch (Exception e)
       {
-        await ReplyAsync("", false, embed.Build());
+        await Context.User.SendMessageAsync(e.Message);
+      }
+      finally
+      {
+        await Context.Message.DeleteAsync();
       }
     }
 
+    [RequireUserPermission(GuildPermission.Administrator)]
     [Command("add"), Alias("a"), Summary("Add a reaction to the guild")]
     public async Task AddReaction(ulong id, Regex rgx, [Remainder] string phrase)
     {
@@ -52,6 +64,7 @@ namespace HumanResources.ReactionsModule
       }
     }
 
+    [RequireUserPermission(GuildPermission.Administrator)]
     [Command("remove"), Alias("r"), Summary("Remove reaction")]
     public async Task RemoveReaction(ulong id)
     {

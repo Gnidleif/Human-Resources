@@ -17,6 +17,8 @@ namespace HumanResources.AnnounceModule
 
     private AnnounceResource()
     {
+      Global.Client.UserJoined += Client_UserJoined;
+      Global.Client.UserLeft += Client_UserLeft;
     }
 
     public async Task Initialize()
@@ -29,8 +31,6 @@ namespace HumanResources.AnnounceModule
       if (File.Exists(this.Path) ? JsonUtil.TryRead(this.Path, out temp) : JsonUtil.TryWrite(this.Path, temp))
       {
         this.List = temp;
-        Global.Client.UserJoined += Client_UserJoined;
-        Global.Client.UserLeft += Client_UserLeft;
       }
       await Task.CompletedTask;
     }

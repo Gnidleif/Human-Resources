@@ -1,6 +1,5 @@
 ﻿using HumanResources.Utilities;
 using HumanResources.AdminModule;
-using HumanResources.TwitterModule;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
@@ -62,7 +61,6 @@ namespace HumanResources
         MarkResource.Instance,
         BlacklistResource.Instance,
         TimeoutResource.Instance,
-        TwitterResource.Instance,
         ReactionResource.Instance,
         AnnounceResource.Instance,
       };

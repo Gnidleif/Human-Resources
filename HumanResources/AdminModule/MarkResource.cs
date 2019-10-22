@@ -20,6 +20,7 @@ namespace HumanResources.AdminModule
 
     private MarkResource()
     {
+      Global.Client.GuildMemberUpdated += Client_GuildMemberUpdated;
     }
 
     public async Task Initialize()
@@ -51,8 +52,6 @@ namespace HumanResources.AdminModule
           }
         }
       }
-
-      Global.Client.GuildMemberUpdated += Client_GuildMemberUpdated;
     }
 
     public bool Save() => JsonUtil.TryWrite(this.Path, this.List);

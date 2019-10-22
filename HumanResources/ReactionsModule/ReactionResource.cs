@@ -119,7 +119,7 @@ namespace HumanResources.ReactionsModule
     {
       if (id == default)
       {
-        return JsonConvert.SerializeObject(this.List[gid], Formatting.Indented);
+        return JsonConvert.SerializeObject(this.List[gid].Select(x => new { x.Key, Rgx = x.Value.Rgx.ToString(), x.Value.Phrases }), Formatting.Indented);
       }
       return this.Contains(gid, id) ? JsonConvert.SerializeObject(this.List[gid][id], Formatting.Indented) : string.Empty;
     }

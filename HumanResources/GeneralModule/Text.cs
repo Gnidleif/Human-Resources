@@ -12,6 +12,13 @@ namespace HumanResources.TextModule
 {
   public class Text : ModuleBase<SocketCommandContext>
   {
+    [Command("slap"), Summary("Slap someone around with a large trout")]
+    public async Task Slap(IGuildUser user)
+    {
+      await Context.Message.DeleteAsync();
+      await ReplyAsync($"{Context.User.Mention} slaps {user.Mention} around with a large trout!");
+    }
+
     [Command("spongebob"), Alias("sb"), Summary("Spongebobbify text")]
     public async Task Spongebob([Remainder] string text)
     {
@@ -26,7 +33,18 @@ namespace HumanResources.TextModule
       embed.WithAuthor(user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
       embed.WithColor(247, 235, 98);
       embed.WithDescription(string.Join("", result.ToString()));
-      await ReplyAsync("", false, embed.Build());
+      try
+      {
+        await ReplyAsync("", false, embed.Build());
+      }
+      catch (Exception e)
+      {
+        await Context.User.SendMessageAsync(e.Message);
+      }
+      finally
+      {
+        await Context.Message.DeleteAsync();
+      }
     }
 
     [Command("8ball"), Alias("8b"), Summary("Ask questions, get answers")]

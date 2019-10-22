@@ -102,17 +102,11 @@ The announcement feature is used to let other users know when a user has joined 
 * **m**ar**k** !string/ulong ...string - Set guild mark on user (**admin**)
 * **m**ar**k** **r**emove !string/ulong - Remove guild mark from user (**admin**)
 
-### Twitter - Various Twitter related functions
-
-* **tw**itter **s**earch !string/ulong bool=false - Returns information on Twitter user, set bool to true for verbose
-* **tw**itter **f**ollow !ulong/string !ulong/string - Follow a specified twitter user and output their tweets in the given channel (**admin**)
-* **tw**itter **f**ollow **r**emove !ulong/string !ulong/string - Unfollow a specified twitter user in a given channel (**admin**)
-* **tw**itter **f**ollow **l**ist - Get complete follow list of guild (**admin**)
-
 ### General
 
 * **s**ponge**b**ob !...string - Spongebobbify text input
 * **8b**all !...string - Ask a question, get an answer
+* **slap** !string/ulong - Slap mentioned user with a large trout
 
 ### React - Make the bot react to certain phrases
 
