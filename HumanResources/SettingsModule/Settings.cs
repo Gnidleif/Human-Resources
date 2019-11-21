@@ -43,8 +43,8 @@ namespace HumanResources.Settings
     public async Task SetMark(char mark)
     {
       Config.Bot.Guilds[Context.Guild.Id].Mark = mark;
+      _ = MarkResource.Instance.CheckSetGuild(Context.Guild);
       await ReplyAsync($":white_check_mark: Successfully set mark to **{mark}**");
-      await MarkResource.Instance.CheckSetGuild(Context.Guild);
     }
 
     [Command("marklist"), Alias("ml"), Summary("Set if marked members are also blacklisted or not")]
@@ -55,7 +55,7 @@ namespace HumanResources.Settings
       var gid = Context.Guild.Id;
       MarkResource.Instance.GetUsersByGuild(gid).ForEach(uid => 
       {
-        _ = state == true ? BlacklistResource.Instance.Push(gid, uid) : BlacklistResource.Instance.Pop(gid, uid);
+        _ = state ? BlacklistResource.Instance.Push(gid, uid) : BlacklistResource.Instance.Pop(gid, uid);
       });
       await ReplyAsync($":white_check_mark: Successfully set blacklist on mark to **{state}**");
     }

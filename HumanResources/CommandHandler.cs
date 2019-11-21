@@ -50,6 +50,14 @@ namespace HumanResources
           return;
         }
 
+        if (msg.MentionedUsers.Count > 0 && MarkResource.Instance.Contains(ctx.Guild.Id, ctx.User.Id))
+        {
+          await ctx.Message.DeleteAsync();
+          await ctx.User.SendMessageAsync($"Your {Config.Bot.Guilds[ctx.Guild.Id].Mark} is stopping you from mentioning users");
+          await TimeoutResource.Instance.SetTimeout(ctx.User as IGuildUser, 1);
+          return;
+        }
+
         var resp = string.Join("\n", ReactionResource.Instance.Find(ctx.Guild.Id, msg.Content));
         if (!string.IsNullOrEmpty(resp))
         {
